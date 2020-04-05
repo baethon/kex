@@ -1,0 +1,42 @@
+{
+  "name": "@baethon/kex",
+  "version": "1.0.0",
+  "description": "Knex extended query objects",
+  "main": "index.js",
+  "author": "Radoslaw Mejer <radmen@baethon.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "ava",
+    "lint": "standard",
+    "lint:fix": "standard --fix"
+  },
+  "dependencies": {
+    "lodash.snakecase": "^4.1.1",
+    "pluralize": "^8.0.0"
+  },
+  "devDependencies": {
+    "ava": "^3.6.0",
+    "husky": "^4.2.3",
+    "knex": "^0.20.13",
+    "lint-staged": "^10.1.1",
+    "sqlite3": "^4.1.1",
+    "standard": "^14.3.3"
+  },
+  "peerDependencies": {
+    "knex": "^0.20.13"
+  },
+  "lint-staged": {
+    "*.js": "npm run lint:fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "ava": {
+    "failFast": true,
+    "files": [
+      "tests/**/*.test.js"
+    ]
+  }
+}
