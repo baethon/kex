@@ -1,6 +1,5 @@
 const path = require('path')
 const knex = require('knex')
-const Kex = require('../')
 const test = require('ava')
 
 module.exports = () => {
@@ -21,9 +20,5 @@ module.exports = () => {
     await connection.seed.run()
 
     t.context.knex = connection
-  })
-
-  test.beforeEach(t => {
-    t.context.kex = new Kex(t.context.knex)
   })
 }
