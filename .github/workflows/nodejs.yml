@@ -10,7 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test sqlite:
+  test_sqlite:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,7 +24,7 @@ jobs:
     - run: yarn
     - run: yarn lint
     - run: yarn test
-  test postgres:
+  test_postgres:
     runs-on: ubuntu-latest
     container: node:12-alpine
     services:
