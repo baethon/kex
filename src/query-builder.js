@@ -128,15 +128,10 @@ class QueryBuilder extends BaseQueryBuilder {
 
 const createChildClass = (tableName, options) => {
   const { scopes = {}, globalScopes = {} } = options
-  const id = `${Math.random()}-${Object.keys(globalScopes).join('-')}`
 
   class ChildQueryBuilder extends QueryBuilder {
     static get tableName () {
       return tableName
-    }
-
-    static get _id () {
-      return id
     }
   }
 
