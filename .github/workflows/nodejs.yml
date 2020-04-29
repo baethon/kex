@@ -41,6 +41,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: yarn
+    - run: yarn add pg
     - run: yarn test
       env:
         DB_CLIENT: pg
