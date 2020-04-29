@@ -5,8 +5,8 @@ const test = require('ava')
 module.exports = () => {
   test.before(async t => {
     const connection = knex({
-      client: 'sqlite',
-      connection: ':memory:',
+      client: process.env.DB_CLIENT || 'sqlite',
+      connection: process.env.DB_URL || ':memory:',
       migrations: {
         directory: path.join(__dirname, './migrations')
       },
