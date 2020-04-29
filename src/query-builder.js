@@ -1,5 +1,9 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 
+const toScope = fn => function (...args) {
+  return this.where(qb => fn(qb, ...args))
+}
+
 class QueryBuilder extends BaseQueryBuilder {
   static create (client) {
     const Builder = this
@@ -17,18 +21,54 @@ class QueryBuilder extends BaseQueryBuilder {
       }
     )
 
-    return new this(localClient)
+    const qb = new this(localClient)
+
+    return qb.table(this.tableName)
+  }
+
+  static setScopes (scopesList) {
+    Object.entries(scopesList)
+      .forEach(([name, fn]) => this.addScope(name, fn))
+
+    return this
+  }
+
+  static setGlobalScopes (scopesList) {
+    Object.entries(scopesList)
+      .forEach(([name, fn]) => this.addGlobalScope(name, fn))
+
+    return this
   }
 
   static addScope (name, fn) {
-    this.prototype[name] = function (...args) {
-      return this.where(qb => fn(qb, ...args))
-    }
+    this.prototype[name] = toScope(fn)
+  }
+
+  static addGlobalScope (name, fn) {
+    this.globalScopes[name] = toScope(fn)
+  }
+
+  toSQL (method, tz) {
+    Object.entries(this.constructor.globalScopes)
+      .forEach(([name, scope]) => scope.call(this))
+
+    return super.toSQL(method, tz)
   }
 }
 
-const createChildClass = () => {
-  return class extends QueryBuilder {}
+QueryBuilder.globalScopes = {}
+
+const createChildClass = (tableName, options) => {
+  const { scopes = {}, globalScopes = {} } = options
+
+  class ChildQueryBuilder extends QueryBuilder {
+    static get tableName () {
+      return tableName
+    }
+  }
+
+  return ChildQueryBuilder.setScopes(scopes)
+    .setGlobalScopes(globalScopes)
 }
 
 module.exports = { createChildClass }

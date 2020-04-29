@@ -72,5 +72,37 @@ test('nested scopes', t => {
   equalQueries(t, expected, actual)
 })
 
-test.todo('global scopes')
+test('global scopes', t => {
+  const { knex } = t.context
+  const User = createKex(t).createModel('User', {
+    globalScopes: {
+      active: scopes.activeUser
+    }
+  })
+
+  const expected = knex('users')
+    .where(scopes.activeUser)
+
+  equalQueries(t, expected, User.query())
+})
+
+test('global scopes | combine with other filters', t => {
+  const { knex } = t.context
+  const User = createKex(t).createModel('User', {
+    globalScopes: {
+      active: scopes.activeUser
+    }
+  })
+
+  const expected = knex('users')
+    .where('age', '>=', 18)
+    .where(scopes.activeUser)
+  const actual = User.query()
+    .where('age', '>=', 18)
+
+  equalQueries(t, expected, actual)
+})
+
 test.todo('global scopes | ignore selected')
+test.todo('global scopes | disable on update')
+test.todo('global scopes | disable on insert')
