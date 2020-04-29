@@ -133,6 +133,13 @@ test('global scopes | ignore all scopes', t => {
 
 test('global scopes | include in update', t => {
   const { knex } = t.context
+
+  createKex(t).createModel('User', {
+    globalScopes: {
+      age: qb => qb.where('age', '>=', 18)
+    }
+  })
+
   const User = createKex(t).createModel('User', {
     globalScopes: {
       active: scopes.activeUser
@@ -151,7 +158,7 @@ test('global scopes | include in update', t => {
   equalQueries(t, expected, actual)
 })
 
-test.only('global scopes | include in delete', t => {
+test('global scopes | include in delete', t => {
   const { knex } = t.context
   const User = createKex(t).createModel('User', {
     globalScopes: {
