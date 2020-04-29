@@ -10,6 +10,16 @@ on:
     branches: [ master ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - run: yarn
+    - run: yarn lint
   test_sqlite:
     runs-on: ubuntu-latest
     strategy:
@@ -22,7 +32,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn
-    - run: yarn lint
     - run: yarn test
   test_postgres:
     runs-on: ubuntu-latest
