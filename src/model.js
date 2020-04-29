@@ -6,7 +6,7 @@ const getTableName = (modelName, { tableName }) => {
   return tableName || snakeCase(pluralize.plural(modelName))
 }
 
-module.exports = (knex, name, options) => {
+const createModel = (knex, name, options) => {
   const tableName = getTableName(name, options)
 
   const Model = {
@@ -19,3 +19,13 @@ module.exports = (knex, name, options) => {
 
   return Model
 }
+
+const applyPlugins = function (plugins, Model, options) {
+  plugins.forEach(fn => {
+    fn(Model, options)
+  })
+
+  return Model
+}
+
+module.exports = { createModel, applyPlugins }
