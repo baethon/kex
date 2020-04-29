@@ -1,5 +1,14 @@
-const setClassName = (Type, name) => {
-  Object.defineProperty(Type, 'name', { value: name })
-}
+/**
+ * @param {Object} object
+ * @param {String[]} props
+ * @return {Object}
+ */
+const omit = (object, props) => props.reduce(
+  (carry, name) => {
+    delete carry[name]
+    return carry
+  },
+  { ...object }
+)
 
-module.exports = { setClassName }
+module.exports = { omit }
