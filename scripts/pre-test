@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+// vim: set ft=javascript
+
+const knex = require('knex')
+
+const connection = knex(require('../tests/knexfile'))
+
+connection.migrate.latest()
+  .then(() => connection.seed.run())
+  .then(() => {
+    console.log('Successfully migrated & seeded the database')
+
+    connection.destroy(() => {
+      process.exit(0)
+    })
+  })
+  .catch(err => {
+    console.warn(err)
+    process.exit(1)
+  })
