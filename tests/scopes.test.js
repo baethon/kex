@@ -177,3 +177,20 @@ test('global scopes | include in delete', t => {
 
   equalQueries(t, expected, actual)
 })
+
+test('global scopes | ignore in inserts', t => {
+  const { knex } = t.context
+  const User = createKex(t).createModel('User', {
+    globalScopes: {
+      active: scopes.activeUser
+    }
+  })
+
+  const expected = knex('users')
+    .insert({ name: 'Jon' })
+
+  const actual = User.query()
+    .insert({ name: 'Jon' })
+
+  equalQueries(t, expected, actual)
+})
