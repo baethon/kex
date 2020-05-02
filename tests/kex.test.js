@@ -37,7 +37,7 @@ test.serial('merge default options with model options', t => {
     }
   })
 
-  const stub = sinon.stub(modelUtils, 'createModel').returns({})
+  const spy = sinon.spy(modelUtils, 'createModel')
 
   kex.createModel('User', {
     softDeletes: true,
@@ -46,7 +46,7 @@ test.serial('merge default options with model options', t => {
 
   modelUtils.createModel.restore()
 
-  t.true(stub.calledWith(knex, 'User', {
+  t.true(spy.calledWith(knex, 'User', {
     hello: 'there!',
     softDeletes: true,
     nested: { enabled: false }
@@ -62,11 +62,11 @@ test.serial('merge default options with model options | ignore selected options'
     }
   })
 
-  const stub = sinon.stub(modelUtils, 'createModel').returns({})
+  const spy = sinon.spy(modelUtils, 'createModel')
 
   kex.createModel('User')
 
   modelUtils.createModel.restore()
 
-  t.true(stub.calledWith(knex, 'User', {}))
+  t.true(spy.calledWith(knex, 'User', {}))
 })
