@@ -1,2 +1,5 @@
 const Kex = require('./src/kex')
-module.exports = Kex
+
+module.exports = {
+  Kex
+}

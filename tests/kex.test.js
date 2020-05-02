@@ -37,7 +37,7 @@ test.serial('merge default options with model options', t => {
     }
   })
 
-  const stub = sinon.stub(modelUtils, 'createModel')
+  const stub = sinon.stub(modelUtils, 'createModel').returns({})
 
   kex.createModel('User', {
     softDeletes: true,
@@ -62,7 +62,7 @@ test.serial('merge default options with model options | ignore selected options'
     }
   })
 
-  const stub = sinon.stub(modelUtils, 'createModel')
+  const stub = sinon.stub(modelUtils, 'createModel').returns({})
 
   kex.createModel('User')
 
