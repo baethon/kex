@@ -6,6 +6,10 @@ class ModelNotFound extends KexError {
   static findOrFail (Model, { primaryKey, value }) {
     return new this(`${getBaseMessage(Model)} (${primaryKey}:${value})`)
   }
+
+  static firstOrFail (Model) {
+    return new this(getBaseMessage(Model))
+  }
 }
 
 module.exports = ModelNotFound

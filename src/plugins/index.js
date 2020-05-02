@@ -1,3 +1,4 @@
 module.exports = [
-  require('./find')
+  require('./find'),
+  require('./first-or-fail')
 ]
