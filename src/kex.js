@@ -1,5 +1,6 @@
 const modelUtils = require('./model')
 const { omit } = require('./utils')
+const builtinPlugins = require('./plugins')
 
 class Kex {
   constructor (knex, options) {
@@ -41,8 +42,12 @@ class Kex {
       ...options
     }
 
+    const modelPlugins = [
+      ...builtinPlugins,
+      ...plugins
+    ]
     const Model = modelUtils.createModel(this.knex, name, useOptions)
-    this.models[name] = modelUtils.applyPlugins(plugins, Model, useOptions)
+    this.models[name] = modelUtils.applyPlugins(modelPlugins, Model, useOptions)
 
     return this.models[name]
   }

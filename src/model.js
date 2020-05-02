@@ -8,16 +8,21 @@ const getTableName = (modelName, { tableName }) => {
 
 const createModel = (knex, name, options) => {
   const tableName = getTableName(name, options)
+  const builder = QueryBuilder.createChildClass(tableName, options)
 
-  const Model = {
-    QueryBuilder: QueryBuilder.createChildClass(tableName, options),
+  return {
+    get QueryBuilder () {
+      return builder
+    },
 
     query () {
       return this.QueryBuilder.create(knex.client)
+    },
+
+    get name () {
+      return name
     }
   }
-
-  return Model
 }
 
 const applyPlugins = function (plugins, Model, options) {
