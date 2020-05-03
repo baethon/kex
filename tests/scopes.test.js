@@ -194,3 +194,5 @@ test('global scopes | ignore in inserts', t => {
 
   equalQueries(t, expected, actual)
 })
+
+test.todo('don\'t wrap the scope results')
