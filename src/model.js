@@ -6,7 +6,7 @@ const getTableName = (modelName, { tableName }) => {
   return tableName || snakeCase(pluralize.plural(modelName))
 }
 
-const createModel = (knex, name, options) => {
+const createModel = (kex, name, options) => {
   const tableName = getTableName(name, options)
   const builder = QueryBuilder.createChildClass(tableName, options)
 
@@ -16,11 +16,16 @@ const createModel = (knex, name, options) => {
     },
 
     query () {
+      const { knex } = this.kex
       return this.QueryBuilder.create(knex.client)
     },
 
     get name () {
       return name
+    },
+
+    get kex () {
+      return kex
     }
   }
 }
