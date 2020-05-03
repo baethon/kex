@@ -2,7 +2,7 @@ const test = require('ava')
 const sinon = require('sinon')
 const setupDb = require('../setup-db')
 const { equalQueries } = require('../assertions')
-const { createKex } = require('../utils')
+const { createKex, onlyForClient } = require('../utils')
 
 setupDb()
 
@@ -90,11 +90,7 @@ test('trashing models', t => {
   equalQueries(t, expected, actual)
 })
 
-test('trashing models | pass the returning cols (only `pg` DB_CLIENT)', t => {
-  if (process.env.DB_CLIENT !== 'pg') {
-    return t.pass()
-  }
-
+onlyForClient('pg', 'trashing models | pass the returning cols', t => {
   const { knex, User } = t.context
 
   const expected = knex.table('users')
@@ -145,11 +141,7 @@ test('deleting models', t => {
   equalQueries(t, expected, actual)
 })
 
-test('deleting models | pass the returning cols (only `pg` DB_CLIENT)', t => {
-  if (process.env.DB_CLIENT !== 'pg') {
-    return t.pass()
-  }
-
+onlyForClient('pg', 'deleting models | pass the returning cols', t => {
   const { knex, User } = t.context
 
   const expected = knex.table('users')
@@ -165,3 +157,4 @@ test('deleting models | pass the returning cols (only `pg` DB_CLIENT)', t => {
 })
 
 test.todo('restoring models')
+test.todo('restoring models | support returning columns')
