@@ -28,7 +28,8 @@ test('single scope', t => {
   const { knex, User } = t.context
 
   const expected = knex('users')
-    .where(scopes.activeUser)
+  scopes.activeUser(expected)
+
   const actual = User.query()
     .activeUser()
 
@@ -39,7 +40,8 @@ test('passing args to scope', t => {
   const { knex, User } = t.context
 
   const expected = knex('users')
-    .where(qb => scopes.allowedAge(qb, 18))
+  scopes.allowedAge(expected, 18)
+
   const actual = User.query()
     .allowedAge(18)
 
@@ -50,8 +52,9 @@ test('combine scopes', t => {
   const { knex, User } = t.context
 
   const expected = knex('users')
-    .where(scopes.activeUser)
-    .where(qb => scopes.allowedAge(qb, 18))
+  scopes.activeUser(expected)
+  scopes.allowedAge(expected, 18)
+
   const actual = User.query()
     .activeUser()
     .allowedAge(18)
@@ -63,8 +66,9 @@ test('nested scopes', t => {
   const { knex, User } = t.context
 
   const expected = knex('users')
-    .where(scopes.activeUser)
-    .orWhere(qb => qb.where(qb => scopes.allowedAge(qb, 18)))
+  scopes.activeUser(expected)
+  expected.orWhere(qb => scopes.allowedAge(qb, 18))
+
   const actual = User.query()
     .activeUser()
     .orWhere(qb => qb.allowedAge(18))
@@ -81,7 +85,7 @@ test('global scopes', t => {
   })
 
   const expected = knex('users')
-    .where(scopes.activeUser)
+  scopes.activeUser(expected)
 
   equalQueries(t, expected, User.query())
 })
@@ -96,7 +100,8 @@ test('global scopes | combine with other filters', t => {
 
   const expected = knex('users')
     .where('age', '>=', 18)
-    .where(scopes.activeUser)
+  scopes.activeUser(expected)
+
   const actual = User.query()
     .where('age', '>=', 18)
 
@@ -113,7 +118,7 @@ test('global scopes | ignore selected', t => {
   })
 
   const expected = knex('users')
-    .where(qb => qb.where('age', '>=', 18))
+    .where('age', '>=', 18)
 
   equalQueries(t, expected, User.query().withoutGlobalScopes(['active']))
   equalQueries(t, expected, User.query().withoutGlobalScope('active'))
@@ -148,8 +153,8 @@ test('global scopes | include in update', t => {
 
   const expected = knex('users')
     .where('id', 1)
-    .where(scopes.activeUser)
     .update({ name: 'Jon' })
+  scopes.activeUser(expected)
 
   const actual = User.query()
     .where('id', 1)
@@ -168,8 +173,8 @@ test('global scopes | include in delete', t => {
 
   const expected = knex('users')
     .where('id', 1)
-    .where(scopes.activeUser)
     .delete()
+  scopes.activeUser(expected)
 
   const actual = User.query()
     .where('id', 1)

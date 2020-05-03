@@ -1,7 +1,8 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 
-const toScope = fn => function (...args) {
-  return this.where(qb => fn(qb, ...args))
+const toScope = (fn) => function (...args) {
+  fn(this, ...args)
+  return this
 }
 
 class QueryBuilder extends BaseQueryBuilder {
