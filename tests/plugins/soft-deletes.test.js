@@ -22,7 +22,7 @@ test('add global scope', t => {
   const { knex, User } = t.context
 
   const expected = knex.table('users')
-    .where(qb => qb.whereNull('deleted_at'))
+    .whereNull('deleted_at')
 
   equalQueries(t, expected, User.query())
 })
@@ -36,7 +36,7 @@ test('add global scope | custom column name', t => {
   })
 
   const expected = knex.table('users')
-    .where(qb => qb.whereNull('deletedAt'))
+    .whereNull('deletedAt')
 
   equalQueries(t, expected, User.query())
 })

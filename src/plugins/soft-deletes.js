@@ -17,10 +17,10 @@ module.exports = (Model, options) => {
 
   Model.QueryBuilder.addScope('withTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
-  }, { wrap: false })
+  })
 
   Model.QueryBuilder.addScope('onlyTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
     qb.whereNotNull(columnName)
-  }, { wrap: false })
+  })
 }

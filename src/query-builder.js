@@ -1,22 +1,7 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 
-/**
- * Convert given fn to WHERE clause
- *
- * @param {Function} fn
- * @param {Object} [options]
- * @param {Boolean} [options.wrap=true] when TRUE - wrap the results of function in round brackets
- * @return {Function}
- */
-const toScope = (fn, options = {}) => function (...args) {
-  const { wrap = true } = options
-
-  if (wrap) {
-    return this.where(qb => fn(qb, ...args))
-  }
-
+const toScope = (fn) => function (...args) {
   fn(this, ...args)
-
   return this
 }
 
@@ -79,10 +64,9 @@ class QueryBuilder extends BaseQueryBuilder {
    *
    * @param {String} name
    * @param {Function} fn
-   * @param {Object} options
    */
-  static addScope (name, fn, options = {}) {
-    this.prototype[name] = toScope(fn, options)
+  static addScope (name, fn) {
+    this.prototype[name] = toScope(fn)
   }
 
   /**
