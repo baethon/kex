@@ -159,7 +159,7 @@ test('deleting models | pass the returning cols (only `pg` DB_CLIENT)', t => {
 
   const actual = User.query()
     .where('id', 1)
-    .delete('id')
+    .delete('id', { trash: false })
 
   equalQueries(t, expected, actual)
 })
