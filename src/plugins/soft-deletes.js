@@ -51,4 +51,11 @@ module.exports = (Model, options) => {
 
     return deleteMethod.call(this, returning)
   }
+
+  Model.QueryBuilder.prototype.restore = function () {
+    return this.withoutGlobalScope('soft-deletes')
+      .update({
+        [columnName]: null
+      })
+  }
 }

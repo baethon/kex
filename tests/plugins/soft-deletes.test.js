@@ -156,5 +156,39 @@ onlyForClient('pg', 'deleting models | pass the returning cols', t => {
   equalQueries(t, expected, actual)
 })
 
-test.todo('restoring models')
-test.todo('restoring models | support returning columns')
+test('restoring models', t => {
+  const { knex, User } = t.context
+
+  const expected = knex.table('users')
+    .where('id', 1)
+    .update({
+      deleted_at: null
+    })
+
+  const actual = User.query()
+    .where('id', 1)
+    .restore()
+
+  equalQueries(t, expected, actual)
+})
+
+test('restoring models | custom column name', t => {
+  const { knex } = t.context
+  const User = createKex(t).createModel('User', {
+    softDeletes: {
+      columnName: 'deletedAt'
+    }
+  })
+
+  const expected = knex.table('users')
+    .where('id', 1)
+    .update({
+      deletedAt: null
+    })
+
+  const actual = User.query()
+    .where('id', 1)
+    .restore()
+
+  equalQueries(t, expected, actual)
+})
