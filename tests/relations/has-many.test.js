@@ -13,6 +13,10 @@ test.serial.before(async t => {
     scopes: {
       fromUser: (qb, user) => {
         qb.where('user_id', user.id)
+      },
+
+      toUser: (qb, user) => {
+        qb.where('to_user', user.id)
       }
     }
   })
@@ -25,14 +29,93 @@ test.serial.before(async t => {
   Object.assign(t.context, { kex, Message, User, users })
 })
 
-test('fetch related messages', async t => {
+test.serial('fetch users sent messages', async t => {
   const { kex, Message, users } = t.context
 
   const relation = new HasMany('Message')
   const dataLoader = relation.createDataLoader('User', kex)
   const expected = {
-    jon: await Message.query().where('user_id', users.jon.id),
-    sansa: await Message.query().where('user_id', users.sansa.id)
+    jon: await Message.query().fromUser(users.jon),
+    sansa: await Message.query().fromUser(users.sansa)
+  }
+
+  const spy = sinon.spy(Message, 'query')
+  const actual = await Promise
+    .all([
+      dataLoader(users.jon),
+      dataLoader(users.sansa)
+    ])
+    .then(([jon, sansa]) => ({ jon, sansa }))
+
+  spy.restore()
+
+  t.deepEqual(actual, expected)
+  t.true(spy.calledOnce)
+})
+
+test.serial('fetch users received messages', async t => {
+  const { kex, Message, users } = t.context
+
+  const relation = new HasMany('Message', 'to_user')
+  const dataLoader = relation.createDataLoader('User', kex)
+  const expected = {
+    jon: await Message.query().toUser(users.jon),
+    sansa: await Message.query().toUser(users.sansa)
+  }
+
+  const spy = sinon.spy(Message, 'query')
+  const actual = await Promise
+    .all([
+      dataLoader(users.jon),
+      dataLoader(users.sansa)
+    ])
+    .then(([jon, sansa]) => ({ jon, sansa }))
+
+  spy.restore()
+
+  t.deepEqual(actual, expected)
+  t.true(spy.calledOnce)
+})
+
+test.serial('fetch users sent messages | use different model key', async t => {
+  const { kex, Message, users } = t.context
+
+  const relation = new HasMany('Message', 'from_username', 'username')
+  const dataLoader = relation.createDataLoader('User', kex)
+  const expected = {
+    jon: await Message.query().fromUser(users.jon),
+    sansa: await Message.query().fromUser(users.sansa)
+  }
+
+  const spy = sinon.spy(Message, 'query')
+  const actual = await Promise
+    .all([
+      dataLoader(users.jon),
+      dataLoader(users.sansa)
+    ])
+    .then(([jon, sansa]) => ({ jon, sansa }))
+
+  spy.restore()
+
+  t.deepEqual(actual, expected)
+  t.true(spy.calledOnce)
+})
+
+test.serial('fetch users sent messages | pass custom qb modifier', async t => {
+  const { kex, Message, users } = t.context
+
+  t.plan(3)
+
+  const relation = new HasMany('Message')
+  const dataLoader = relation.createDataLoader('User', kex, qb => {
+    t.true(qb instanceof Message.QueryBuilder)
+
+    qb.onlyTrashed()
+  })
+
+  const expected = {
+    jon: await Message.query().fromUser(users.jon).onlyTrashed(),
+    sansa: await Message.query().fromUser(users.sansa).onlyTrashed()
   }
 
   const spy = sinon.spy(Message, 'query')

@@ -11,29 +11,41 @@ const { mapToMany, prop } = require('../utils')
  * @return {Promise<Object|Object[]>}
  */
 
+const noop = () => {}
+
 class HasMany {
   /**
-   * @param {String} relatedModel
+   * @param {String} related
+   * @param {String} foreignKey
+   * @param {String} localKey
    */
-  constructor (relatedModel) {
-    this.relatedModel = relatedModel
+  constructor (related, foreignKey, localKey) {
+    this.related = related
+    this.foreignKey = foreignKey
+    this.localKey = localKey
   }
 
   /**
    * @param {String} parentModel
    * @param {import('../kex')} kex
+   * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
-  createDataLoader (parentModel, kex) {
-    const Model = kex.getModel(this.relatedModel)
+  createDataLoader (parentModel, kex, scope = noop) {
+    const Model = kex.getModel(this.related)
     const Parent = kex.getModel(parentModel)
     const foreignKey = this.getForeignKeyName(Parent)
-    const loader = new DataLoader(keys => Model.query()
-      .whereIn(foreignKey, keys)
-      .then(mapToMany(keys, prop(foreignKey)))
-    )
+    const localKey = this.getLocalKey()
+    const loader = new DataLoader(keys => {
+      const query = Model.query()
+        .whereIn(foreignKey, keys)
 
-    return model => loader.load(model.id)
+      scope(query)
+
+      return query.then(mapToMany(keys, prop(foreignKey)))
+    })
+
+    return model => loader.load(model[localKey])
   }
 
   /**
@@ -42,9 +54,15 @@ class HasMany {
    * @private
    */
   getForeignKeyName (Model) {
-    const { tableName } = Model
+    return this.foreignKey || snakeCase(`${pluralize.singular(Model.tableName)} id`)
+  }
 
-    return snakeCase(`${pluralize.singular(tableName)} id`)
+  /**
+   * @return {String}
+   * @private
+   */
+  getLocalKey () {
+    return this.localKey || 'id'
   }
 }
 

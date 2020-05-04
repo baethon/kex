@@ -42,6 +42,5 @@ module.exports = {
   omit,
   mapTo,
   mapToMany,
-  indentity: value => value,
   prop: name => item => item[name]
 }
