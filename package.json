@@ -8,7 +8,6 @@
   "scripts": {
     "pretest": "./scripts/pre-test",
     "test": "ava",
-    "posttest": "./scripts/post-test",
     "lint": "standard",
     "lint:fix": "standard --fix"
   },
