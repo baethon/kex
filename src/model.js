@@ -14,6 +14,7 @@ const getTableName = (modelName, { tableName }) => {
  * @property {Function} query create new query
  * @property {String} name name of the model
  * @property {Kex} kex
+ * @property {String} tableName
  */
 
 /**
@@ -33,17 +34,21 @@ const createModel = (kex, name, options) => {
       return builder
     },
 
-    query () {
-      const { knex } = this.kex
-      return this.QueryBuilder.create(knex.client)
-    },
-
     get name () {
       return name
     },
 
     get kex () {
       return kex
+    },
+
+    get tableName () {
+      return tableName
+    },
+
+    query () {
+      const { knex } = this.kex
+      return this.QueryBuilder.create(knex.client)
     }
   }
 }

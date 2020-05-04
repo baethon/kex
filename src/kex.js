@@ -6,10 +6,12 @@ const { KexError } = require('./errors')
 /** @typedef { import('knex/lib/query/builder') } Knex */
 /** @typedef { import('./query-builder').Scope } Scope */
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
+/** @typedef { import('./model').Model } Model */
 
 /**
  * @type {Object} ModelDefaultOptions
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Object.<String, Object>} [relations]
  * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
@@ -20,6 +22,7 @@ const { KexError } = require('./errors')
  * @property {String} [tableName]
  * @property {String} [primaryKey=id]
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Object.<String, Object>} [relations]
  * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
