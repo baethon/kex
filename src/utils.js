@@ -20,7 +20,16 @@ const omit = (object, props) => props.reduce(
  */
 const mapTo = (keys, keyFn) => (rows) => {
   const group = new Map(keys.map(key => ([key, null])))
-  rows.forEach(row => group.set(keyFn(row), row))
+
+  rows.forEach(row => {
+    const key = keyFn(row)
+    const value = group.get(key)
+
+    if (!value) {
+      group.set(key, row)
+    }
+  })
+
   return Array.from(group.values())
 }
 

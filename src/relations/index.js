@@ -1,3 +1,4 @@
 module.exports = {
-  HasMany: require('./has-many')
+  HasMany: require('./has-many'),
+  HasOne: require('./has-one')
 }
