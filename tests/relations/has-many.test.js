@@ -1,8 +1,8 @@
 const test = require('ava')
-const sinon = require('sinon')
 const setupDb = require('../setup-db')
 const { createKex } = require('../utils')
 const { HasMany } = require('../../')
+const createMacro = require('./has-any.macro')
 
 setupDb()
 
@@ -29,105 +29,36 @@ test.serial.before(async t => {
   Object.assign(t.context, { kex, Message, User, users })
 })
 
-test.serial('fetch users sent messages', async t => {
-  const { kex, Message, users } = t.context
+const macro = createMacro(HasMany)
 
-  const relation = new HasMany('Message')
-  const dataLoader = relation.createDataLoader('User', kex)
-  const expected = {
-    jon: await Message.query().fromUser(users.jon),
-    sansa: await Message.query().fromUser(users.sansa)
-  }
-
-  const spy = sinon.spy(Message, 'query')
-  const actual = await Promise
-    .all([
-      dataLoader(users.jon),
-      dataLoader(users.sansa)
-    ])
-    .then(([jon, sansa]) => ({ jon, sansa }))
-
-  spy.restore()
-
-  t.deepEqual(actual, expected)
-  t.true(spy.calledOnce)
+test.serial(macro, {
+  expectedFn: (Message, users) => Promise.all([
+    Message.query().fromUser(users.jon),
+    Message.query().fromUser(users.sansa)
+  ])
 })
 
-test.serial('fetch users received messages', async t => {
-  const { kex, Message, users } = t.context
-
-  const relation = new HasMany('Message', 'to_user')
-  const dataLoader = relation.createDataLoader('User', kex)
-  const expected = {
-    jon: await Message.query().toUser(users.jon),
-    sansa: await Message.query().toUser(users.sansa)
-  }
-
-  const spy = sinon.spy(Message, 'query')
-  const actual = await Promise
-    .all([
-      dataLoader(users.jon),
-      dataLoader(users.sansa)
-    ])
-    .then(([jon, sansa]) => ({ jon, sansa }))
-
-  spy.restore()
-
-  t.deepEqual(actual, expected)
-  t.true(spy.calledOnce)
+test.serial(macro, {
+  expectedFn: (Message, users) => Promise.all([
+    Message.query().toUser(users.jon),
+    Message.query().toUser(users.sansa)
+  ]),
+  foreignKey: 'to_user'
 })
 
-test.serial('fetch users sent messages | use different model key', async t => {
-  const { kex, Message, users } = t.context
-
-  const relation = new HasMany('Message', 'from_username', 'username')
-  const dataLoader = relation.createDataLoader('User', kex)
-  const expected = {
-    jon: await Message.query().fromUser(users.jon),
-    sansa: await Message.query().fromUser(users.sansa)
-  }
-
-  const spy = sinon.spy(Message, 'query')
-  const actual = await Promise
-    .all([
-      dataLoader(users.jon),
-      dataLoader(users.sansa)
-    ])
-    .then(([jon, sansa]) => ({ jon, sansa }))
-
-  spy.restore()
-
-  t.deepEqual(actual, expected)
-  t.true(spy.calledOnce)
+test.serial(macro, {
+  expectedFn: (Message, users) => Promise.all([
+    Message.query().fromUser(users.jon),
+    Message.query().fromUser(users.sansa)
+  ]),
+  foreignKey: 'from_username',
+  localKey: 'username'
 })
 
-test.serial('fetch users sent messages | pass custom qb modifier', async t => {
-  const { kex, Message, users } = t.context
-
-  t.plan(3)
-
-  const relation = new HasMany('Message')
-  const dataLoader = relation.createDataLoader('User', kex, qb => {
-    t.true(qb instanceof Message.QueryBuilder)
-
-    qb.onlyTrashed()
-  })
-
-  const expected = {
-    jon: await Message.query().fromUser(users.jon).onlyTrashed(),
-    sansa: await Message.query().fromUser(users.sansa).onlyTrashed()
-  }
-
-  const spy = sinon.spy(Message, 'query')
-  const actual = await Promise
-    .all([
-      dataLoader(users.jon),
-      dataLoader(users.sansa)
-    ])
-    .then(([jon, sansa]) => ({ jon, sansa }))
-
-  spy.restore()
-
-  t.deepEqual(actual, expected)
-  t.true(spy.calledOnce)
+test.serial(macro, {
+  expectedFn: (Message, users) => Promise.all([
+    Message.query().fromUser(users.jon).onlyTrashed(),
+    Message.query().fromUser(users.sansa).onlyTrashed()
+  ]),
+  scope: qb => qb.onlyTrashed()
 })
