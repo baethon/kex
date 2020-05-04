@@ -26,6 +26,7 @@ const { KexError } = require('./errors')
  * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
+ * @property {Object.<String,Object>} [relations]
  */
 
 /**
@@ -56,7 +57,7 @@ class Kex {
 
     this.options = {
       ...otherOptions,
-      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey'])
+      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey', 'relations'])
     }
   }
 

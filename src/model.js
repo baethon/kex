@@ -7,6 +7,8 @@ const getTableName = (modelName, { tableName }) => {
 }
 
 /** @typedef { import('./kex') } Kex */
+/** @typedef { import('./kex').ModelOptions } ModelOptions */
+/** @typedef { import('./query-builder').QueryBuilder } QueryBuilder */
 
 /**
  * @typedef {Object} Model
@@ -16,6 +18,7 @@ const getTableName = (modelName, { tableName }) => {
  * @property {Kex} kex
  * @property {String} tableName
  * @property {String} primaryKey
+ * @property {ModelOptions} options
  */
 
 /**
@@ -23,7 +26,7 @@ const getTableName = (modelName, { tableName }) => {
  *
  * @param {Kex} kex
  * @param {String} name
- * @param {Object} options
+ * @param {ModelOptions} options
  * @return {Model}
  */
 const createModel = (kex, name, options) => {
@@ -49,6 +52,10 @@ const createModel = (kex, name, options) => {
 
     get primaryKey () {
       return options.primaryKey || 'id'
+    },
+
+    get options () {
+      return options
     },
 
     query () {
