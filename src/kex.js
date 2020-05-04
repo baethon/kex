@@ -3,7 +3,38 @@ const { omit } = require('./utils')
 const builtinPlugins = require('./plugins')
 const { KexError } = require('./errors')
 
+/** @typedef { import('knex/lib/query/builder') } Knex */
+/** @typedef { import('./query-builder').Scope } Scope */
+/** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
+
+/**
+ * @type {Object} ModelDefaultOptions
+ * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {PluginFactory[]} [plugins]
+ * @property {Object.<String,Scope>} [scopes]
+ * @property {Object.<String,Scope>} [globalScopes]
+ */
+
+/**
+ * @typedef {Object} ModelOptions
+ * @property {String} [tableName]
+ * @property {String} [primaryKey=id]
+ * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {PluginFactory[]} [plugins]
+ * @property {Object.<String,Scope>} [scopes]
+ * @property {Object.<String,Scope>} [globalScopes]
+ */
+
+/**
+ * @typedef {Object} KexOptions
+ * @property {ModelDefaultOptions} [modelDefaults]
+ */
+
 class Kex {
+  /**
+   * @param {Knex} knex
+   * @param {KexOptions} options
+   */
   constructor (knex, options) {
     this.models = {}
     this.knex = knex
@@ -12,6 +43,7 @@ class Kex {
 
   /**
    * @param {Object}
+   * @private
    */
   setOptions (options) {
     const {
@@ -29,8 +61,9 @@ class Kex {
    * Create new model
    *
    * @param {String} name
-   * @param {Object} options
-   * @return {Object}
+   * @param {ModelOptions} options
+   * @return {Model}
+   * @throws KexError
    */
   createModel (name, options = {}) {
     if (name in this.models) {
@@ -72,7 +105,8 @@ class Kex {
 
   /**
    * @param {String} name
-   * @return {Object}
+   * @return {Model}
+   * @throws KexError
    */
   getModel (name) {
     if (name in this.models) {

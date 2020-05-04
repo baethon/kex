@@ -5,11 +5,19 @@ const toScope = (fn) => function (...args) {
   return this
 }
 
+/** @typedef { import('knex/lib/client') } KnexClient */
+
+/**
+ * @callback Scope
+ * @param {QueryBuilder} qb
+ * @param {...*} args
+ */
+
 class QueryBuilder extends BaseQueryBuilder {
   /**
    * Create instance of QueryBuilder
    *
-   * @param {Object} client Knex client
+   * @param {KnexClient} client Knex client
    * @return {QueryBuilder}
    */
   static create (client) {
@@ -36,7 +44,7 @@ class QueryBuilder extends BaseQueryBuilder {
   /**
    * Set list of query scopes
    *
-   * @param {Object<String, Function>} scopesList
+   * @param {Object<String, Scope>} scopesList
    * @return {QueryBuilder}
    */
   static setScopes (scopesList) {
@@ -49,7 +57,7 @@ class QueryBuilder extends BaseQueryBuilder {
   /**
    * Set list of models global scopes
    *
-   * @param {Object<String, Function>} scopesList
+   * @param {Object<String, Scope>} scopesList
    * @return {QueryBuilder}
    */
   static setGlobalScopes (scopesList) {
@@ -63,7 +71,7 @@ class QueryBuilder extends BaseQueryBuilder {
    * Add a query scope to the model
    *
    * @param {String} name
-   * @param {Function} fn
+   * @param {Scope} fn
    */
   static addScope (name, fn) {
     this.prototype[name] = toScope(fn)
@@ -73,7 +81,7 @@ class QueryBuilder extends BaseQueryBuilder {
    * Add a global scope to the model
    *
    * @param {String} name
-   * @param {Function} fn
+   * @param {Scope} fn
    */
   static addGlobalScope (name, fn) {
     this.globalScopes[name] = toScope(fn)
@@ -84,6 +92,8 @@ class QueryBuilder extends BaseQueryBuilder {
    */
   constructor (client) {
     super(client)
+
+    /** @type {Set<String>} */
     this.ignoredScopes = new Set()
   }
 
@@ -116,7 +126,7 @@ class QueryBuilder extends BaseQueryBuilder {
   /**
    * Exclude list of global scopes from the query
    *
-   * @param {Array} [namesList] when empty, method will exclude all global scopes
+   * @param {String[]} [namesList] when empty, method will exclude all global scopes
    * @return {QueryBuilder}
    */
   withoutGlobalScopes (namesList) {
@@ -127,6 +137,13 @@ class QueryBuilder extends BaseQueryBuilder {
   }
 }
 
+/**
+ * Create the a new child class of QueryBuilder
+ *
+ * @param {String} tableName
+ * @param {Object} options
+ * @returns {QueryBuilder}
+ */
 const createChildClass = (tableName, options) => {
   const { scopes = {}, globalScopes = {} } = options
 

@@ -1,5 +1,14 @@
 const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
 
+/**
+ * @typedef {Object} SoftDeleteOptions
+ * @property {String} [columnName=deleted_at]
+ */
+
+/**
+ * @param {import('../model').Model} Model
+ * @param {import('../kex').ModelOptions} options
+ */
 module.exports = (Model, options) => {
   const { softDeletes = false } = options
 
