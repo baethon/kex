@@ -3,11 +3,11 @@ module.exports = {
     return knex.schema
       .createTable('messages', (table) => {
         table.increments('id')
-        table.integer('userId').unsigned().notNullable()
+        table.integer('user_id').unsigned().notNullable()
         table.string('text')
         table.datetime('deleted_at').nullable()
 
-        table.foreign('userId').references('users.id')
+        table.foreign('user_id').references('users.id')
       })
   },
 

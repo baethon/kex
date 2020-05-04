@@ -12,19 +12,19 @@ module.exports = {
 
     return knex('messages').insert([
       {
-        userId: jon.id,
+        user_id: jon.id,
         text: 'Message #1'
       },
       {
-        userId: jon.id,
+        user_id: jon.id,
         text: 'Message #2'
       },
       {
-        userId: sansa.id,
+        user_id: sansa.id,
         text: 'Message #3'
       },
       {
-        userId: sansa.id,
+        user_id: sansa.id,
         text: 'Message #4'
       }
     ])
