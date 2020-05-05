@@ -1,9 +1,6 @@
 const DataLoader = require('dataloader')
-const pluralize = require('pluralize')
-const snakeCase = require('lodash.snakecase')
 const { mapTo, prop, noop } = require('../utils')
-
-/** @typedef {import('../model').Model} Model */
+const Relation = require('./relation')
 
 /**
  * @callback DataLoader
@@ -11,13 +8,14 @@ const { mapTo, prop, noop } = require('../utils')
  * @return {Promise<Object>}
  */
 
-class HasOne {
+class HasOne extends Relation {
   /**
    * @param {String} related
    * @param {String} foreignKey
    * @param {String} localKey
    */
   constructor (related, foreignKey, localKey) {
+    super()
     this.related = related
     this.foreignKey = foreignKey
     this.localKey = localKey
@@ -32,7 +30,7 @@ class HasOne {
   createDataLoader (parentModel, kex, scope = noop) {
     const Model = kex.getModel(this.related)
     const Parent = kex.getModel(parentModel)
-    const foreignKey = this.getForeignKeyName(Parent)
+    const foreignKey = this.foreignKey || this.getForeignKeyName(Parent)
     const localKey = this.getLocalKey()
     const loader = new DataLoader(keys => {
       const query = Model.query()
@@ -44,15 +42,6 @@ class HasOne {
     })
 
     return model => loader.load(model[localKey])
-  }
-
-  /**
-   * @param {Model} Model
-   * @return {String}
-   * @private
-   */
-  getForeignKeyName (Model) {
-    return this.foreignKey || snakeCase(`${pluralize.singular(Model.tableName)} id`)
   }
 
   /**
