@@ -5,8 +5,6 @@ const { createKex } = require('../utils')
 
 setupDb()
 
-// 'Message #1'
-
 const macro = async (t, options) => {
   const {
     expectedFn,
