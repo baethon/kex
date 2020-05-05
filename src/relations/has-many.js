@@ -1,17 +1,15 @@
 const DataLoader = require('dataloader')
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
-const { mapToMany, prop } = require('../utils')
+const { mapToMany, prop, noop } = require('../utils')
 
 /** @typedef {import('../model').Model} Model */
 
 /**
  * @callback DataLoader
  * @param {Object} item
- * @return {Promise<Object|Object[]>}
+ * @return {Promise<Object[]>}
  */
-
-const noop = () => {}
 
 class HasMany {
   /**

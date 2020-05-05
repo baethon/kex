@@ -1,17 +1,15 @@
 const DataLoader = require('dataloader')
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
-const { mapTo, prop } = require('../utils')
+const { mapTo, prop, noop } = require('../utils')
 
 /** @typedef {import('../model').Model} Model */
 
 /**
  * @callback DataLoader
  * @param {Object} item
- * @return {Promise<Object|Object[]>}
+ * @return {Promise<Object>}
  */
-
-const noop = () => {}
 
 class HasOne {
   /**

@@ -51,5 +51,6 @@ module.exports = {
   omit,
   mapTo,
   mapToMany,
-  prop: name => item => item[name]
+  prop: name => item => item[name],
+  noop: () => {}
 }
