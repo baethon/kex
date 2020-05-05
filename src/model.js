@@ -15,6 +15,7 @@ const getTableName = (modelName, { tableName }) => {
  * @property {String} name name of the model
  * @property {Kex} kex
  * @property {String} tableName
+ * @property {String} primaryKey
  */
 
 /**
@@ -44,6 +45,10 @@ const createModel = (kex, name, options) => {
 
     get tableName () {
       return tableName
+    },
+
+    get primaryKey () {
+      return options.primaryKey || 'id'
     },
 
     query () {
