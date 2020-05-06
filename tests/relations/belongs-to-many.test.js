@@ -15,6 +15,17 @@ test.serial.before(async t => {
   const User = kex.createModel('User')
   const Tag = kex.createModel('Tag')
 
+  Object.assign(t.context, { kex, Tag, User })
+})
+
+const fetchUsersTagsMacro = async (t, options) => {
+  const { kex, Tag, User } = t.context
+  const { expectedFn, ...relationOptions } = options
+  const relation = new BelongsToMany('Tag', relationOptions)
+
+  const spy = sinon.spy(Tag, 'query')
+  const dataLoader = relation.createDataLoader('User', kex)
+
   const users = await User.query()
     .then(users => users.reduce(
       (carry, user) => ({
@@ -23,17 +34,6 @@ test.serial.before(async t => {
       }),
       {}
     ))
-
-  Object.assign(t.context, { kex, users, Tag })
-})
-
-const fetchUsersTagsMacro = async (t, options) => {
-  const { kex, users, Tag } = t.context
-  const { expectedFn, ...relationOptions } = options
-  const relation = new BelongsToMany('Tag', relationOptions)
-
-  const spy = sinon.spy(Tag, 'query')
-  const dataLoader = relation.createDataLoader('User', kex)
 
   const actual = await Promise
     .all([
@@ -46,6 +46,35 @@ const fetchUsersTagsMacro = async (t, options) => {
 
   const expected = await expectedFn(Tag, users)
     .then(([jon, sansa]) => ({ jon, sansa }))
+
+  t.true(spy.calledOnce)
+  t.deepEqual(expected, actual)
+}
+
+/**
+ * This is a simplified version of the `fetchUsersTagsMacro`.
+ *
+ * It's meant to check if the reverse of the same relation works
+ * without any issues.
+ */
+const fetchTagsUsersMacro = async (t, options) => {
+  const { kex, User, Tag } = t.context
+  const relation = new BelongsToMany('User', options)
+
+  const dataLoader = relation.createDataLoader('Tag', kex)
+  const tags = await Tag.query().whereIn('title', ['righteous', 'indignation'])
+  const users = await User.query()
+
+  const spy = sinon.spy(User, 'query')
+  const actual = await Promise
+    .all([
+      dataLoader(tags[0]),
+      dataLoader(tags[1])
+    ])
+
+  spy.restore()
+
+  const expected = [users, users]
 
   t.true(spy.calledOnce)
   t.deepEqual(expected, actual)
@@ -82,4 +111,9 @@ test.serial('fetch user tags | custom keys', fetchUsersTagsMacro, {
   relatedPivotKey: 'tag',
   parentKey: 'username',
   relatedKey: 'title'
+})
+
+test.serial('fetch tags users', fetchTagsUsersMacro, {})
+test.serial('fetch tags users | custom table', fetchTagsUsersMacro, {
+  table: 'user_tag'
 })
