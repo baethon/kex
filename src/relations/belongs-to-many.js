@@ -8,6 +8,13 @@ const { mapToMany, prop, noop, omit } = require('../utils')
 /**
  * @typedef {Object} Options
  * @property {String} [table]
+ * @property {String} [foreignPivotKey] the key used in the pivot table,
+ *                                      referencing the parent model
+ * @property {String} [relatedPivotKey] the key used in the pivot table,
+ *                                      referencing the related model
+ * @property {String} [parentKey]       the parent model key used
+ *                                      to retrieve the related models
+ * @property {String} [relatedKey]      the related model key
  */
 
 const omitPivotFields = groupedRows => groupedRows.map(
@@ -35,17 +42,21 @@ class BelongsToMany extends Relation {
    * @return {DataLoader}
    */
   createDataLoader (model, kex, scope = noop) {
+    const { options } = this
+
     const Model = kex.getModel(model)
-    const foreignPivotKey = this.getForeignKeyName(Model)
+    const foreignPivotKey = options.foreignPivotKey || this.getForeignKeyName(Model)
+    const parentKey = options.parentKey || Model.primaryKey
 
     const Related = kex.getModel(this.related)
-    const relatedPivotKey = this.getForeignKeyName(Related)
+    const relatedPivotKey = options.relatedPivotKey || this.getForeignKeyName(Related)
+    const relatedKey = options.relatedKey || Related.primaryKey
 
-    const table = this.options.table || this.getTableName(Model, Related)
+    const table = options.table || this.getTableName(Model, Related)
 
     const loader = new DataLoader(keys => {
       const query = Related.query()
-        .join(table, `${table}.${relatedPivotKey}`, `${Related.tableName}.${Related.primaryKey}`)
+        .join(table, `${table}.${relatedPivotKey}`, `${Related.tableName}.${relatedKey}`)
         .select(
           `${Related.tableName}.*`,
           `${table}.${foreignPivotKey} AS pivot__foreign_id`
@@ -58,7 +69,7 @@ class BelongsToMany extends Relation {
         .then(omitPivotFields)
     })
 
-    return model => loader.load(model[Model.primaryKey])
+    return model => loader.load(model[parentKey])
   }
 
   /**

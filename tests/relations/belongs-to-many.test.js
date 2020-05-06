@@ -6,8 +6,8 @@ const { createKex } = require('../utils')
 
 setupDb()
 
-const buildTagsJoinQuery = (Tag, table) => Tag.query()
-  .join(`${table} AS pivot`, 'pivot.tag_id', 'tags.id')
+const buildTagsJoinQuery = (Tag, table, pivotKey = 'tag_id', primaryKey = 'id') => Tag.query()
+  .join(`${table} AS pivot`, `pivot.${pivotKey}`, `tags.${primaryKey}`)
   .select('tags.*')
 
 test.serial.before(async t => {
@@ -59,6 +59,7 @@ test.serial('fetch users tags', fetchUsersTagsMacro, {
       .where('pivot.user_id', users.sansa.id)
   ])
 })
+
 test.serial('fetch users tags | custom table name', fetchUsersTagsMacro, {
   expectedFn: (Tag, users) => Promise.all([
     buildTagsJoinQuery(Tag, 'user_tag')
@@ -67,4 +68,18 @@ test.serial('fetch users tags | custom table name', fetchUsersTagsMacro, {
       .where('pivot.user_id', users.sansa.id)
   ]),
   table: 'user_tag'
+})
+
+test.serial('fetch user tags | custom keys', fetchUsersTagsMacro, {
+  expectedFn: (Tag, users) => Promise.all([
+    buildTagsJoinQuery(Tag, 'tag_user_using_strings', 'tag', 'title')
+      .where('pivot.username', users.jon.username),
+    buildTagsJoinQuery(Tag, 'tag_user_using_strings', 'tag', 'title')
+      .where('pivot.username', users.sansa.username)
+  ]),
+  table: 'tag_user_using_strings',
+  foreignPivotKey: 'username',
+  relatedPivotKey: 'tag',
+  parentKey: 'username',
+  relatedKey: 'title'
 })
