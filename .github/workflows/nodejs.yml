@@ -70,9 +70,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: yarn
-    - run: yarn add mysql2
+    - run: yarn add mysql
     - run: yarn test
       env:
         DB_CLIENT: mysql
-        DB_URL: 'mysql://mysql:mysql@mysql:3306test'
+        DB_URL: 'mysql://mysql:mysql@mysql:3306/test'
 
