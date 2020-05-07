@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     container: node:12-alpine
     services:
-      postgres:
+      mysql:
         image: mysql:8
         env:
           MYSQL_DATABASE: test
