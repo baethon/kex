@@ -26,9 +26,9 @@ const omitPivotFields = groupedRows => groupedRows.map(
 class BelongsToMany extends Relation {
   /**
    * @param {String} related
-   * @param {Options} options
+   * @param {Options} [options]
    */
-  constructor (related, options) {
+  constructor (related, options = {}) {
     super()
 
     this.related = related

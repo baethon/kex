@@ -40,17 +40,22 @@ const fetchIncludes = async (results, includes, Model) => {
  */
 const fetchSingleInclude = async (results, name, scope, Model) => {
   const { relations } = Model.options
-  const loader = relations[name].createDataLoader(Model.name, Model.kex, scope)
+  const Relation = relations[name]
+  const loader = loadForItem(
+    Relation.createDataLoader(Model.name, Model.kex, scope),
+    name
+  )
 
-  return Promise.all(results.map(async item => {
-    const related = await loader(item)
-
-    return {
-      ...item,
-      [name]: related
-    }
-  }))
+  return Array.isArray(results)
+    ? Promise.all(results.map(loader))
+    : loader(results)
 }
+
+const loadForItem = (loader, name) => item => loader(item)
+  .then(related => ({
+    ...item,
+    [name]: related
+  }))
 
 /**
  * @param {Model} Model

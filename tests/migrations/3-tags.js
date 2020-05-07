@@ -26,10 +26,18 @@ module.exports = {
         table.foreign('tag').references('tags.title')
         table.foreign('username').references('tags.username')
       })
+      .createTable('message_tag', (table) => {
+        table.integer('message_id').unsigned()
+        table.integer('tag_id').unsigned()
+
+        table.foreign('message_id').references('messages.id')
+        table.foreign('tag_id').references('tags.id')
+      })
   },
 
   down (knex) {
     return knex.schema
+      .dropTable('message_tag')
       .dropTable('tag_user_using_strings')
       .dropTable('user_tag')
       .dropTable('tag_user')
