@@ -1,4 +1,4 @@
-const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
+const { isObject } = require('../utils')
 
 /**
  * @typedef {Object} SoftDeleteOptions

@@ -47,10 +47,21 @@ const mapToMany = (keys, keyFn) => (rows) => {
   return Array.from(group.values())
 }
 
+/**
+ * Determine if given value is object
+ *
+ * Class instances will be rejected.
+ *
+ * @param {*} value
+ * @return {Boolean}
+ */
+const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
+
 module.exports = {
   omit,
   mapTo,
   mapToMany,
+  isObject,
   prop: name => item => item[name],
   noop: () => {}
 }
