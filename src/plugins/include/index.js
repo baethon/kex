@@ -1,8 +1,8 @@
-const Related = require('./include/related')
-const { parseIncludes } = require('./include/include-parser')
+const Related = require('./related')
+const { parseIncludes } = require('./parser')
 
 /**
- * @param {import('../model').Model} Model
+ * @param {import('../../model').Model} Model
  */
 module.exports = (Model) => {
   const { QueryBuilder } = Model

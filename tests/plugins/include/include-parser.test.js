@@ -1,5 +1,5 @@
 const test = require('ava')
-const { parseIncludes, groupIncludes } = require('../../../src/plugins/include/include-parser')
+const { parseIncludes, groupIncludes } = require('../../../src/plugins/include/parser')
 const { noop } = require('../../../src/utils')
 const IncludeScope = require('../../../src/plugins/include/include-scope')
 

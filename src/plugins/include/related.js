@@ -1,5 +1,5 @@
 const { KexError } = require('../../errors')
-const { groupIncludes } = require('./include-parser')
+const { groupIncludes } = require('./parser')
 
 /** @typedef { import('../../model').Model } Model */
 /** @typedef { import('../../query-builder').Scope } Scope */
