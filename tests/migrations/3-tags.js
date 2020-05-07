@@ -24,7 +24,7 @@ module.exports = {
         table.string('username')
 
         table.foreign('tag').references('tags.title')
-        table.foreign('username').references('tags.username')
+        table.foreign('username').references('users.username')
       })
       .createTable('message_tag', (table) => {
         table.integer('message_id').unsigned()
