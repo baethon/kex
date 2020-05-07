@@ -15,16 +15,16 @@ test.serial.before(async t => {
   const User = kex.createModel('User')
   const Tag = kex.createModel('Tag')
 
-  Object.assign(t.context, { kex, Tag, User })
+  Object.assign(t.context, { Tag, User })
 })
 
 const fetchUsersTagsMacro = async (t, options) => {
-  const { kex, Tag, User } = t.context
+  const { Tag, User } = t.context
   const { expectedFn, ...relationOptions } = options
   const relation = new BelongsToMany('Tag', relationOptions)
 
   const spy = sinon.spy(Tag, 'query')
-  const dataLoader = relation.createDataLoader('User', kex)
+  const dataLoader = relation.createDataLoader(User)
 
   const users = await User.query()
     .then(users => users.reduce(
@@ -58,10 +58,10 @@ const fetchUsersTagsMacro = async (t, options) => {
  * without any issues.
  */
 const fetchTagsUsersMacro = async (t, options) => {
-  const { kex, User, Tag } = t.context
+  const { User, Tag } = t.context
   const relation = new BelongsToMany('User', options)
 
-  const dataLoader = relation.createDataLoader('Tag', kex)
+  const dataLoader = relation.createDataLoader(Tag)
   const tags = await Tag.query().whereIn('title', ['righteous', 'indignation'])
   const users = await User.query()
 

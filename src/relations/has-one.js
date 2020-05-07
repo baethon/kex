@@ -22,18 +22,18 @@ class HasOne extends Relation {
   }
 
   /**
-   * @param {String} parentModel
-   * @param {import('../kex')} kex
+   * @param {import('../model').Model} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
-  createDataLoader (parentModel, kex, scope = noop) {
-    const Model = kex.getModel(this.related)
-    const Parent = kex.getModel(parentModel)
-    const foreignKey = this.foreignKey || this.getForeignKeyName(Parent)
+  createDataLoader (Model, scope = noop) {
+    const { kex } = Model
+
+    const Related = kex.getModel(this.related)
+    const foreignKey = this.foreignKey || this.getForeignKeyName(Model)
     const localKey = this.getLocalKey()
     const loader = new DataLoader(keys => {
-      const query = Model.query()
+      const query = Related.query()
         .whereIn(foreignKey, keys)
 
       scope(query)

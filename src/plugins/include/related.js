@@ -63,7 +63,7 @@ class Related {
     }
 
     const Relation = relations[name]
-    const loader = Relation.createDataLoader(this.Model.name, this.Model.kex, scope)
+    const loader = Relation.createDataLoader(this.Model, scope)
 
     return Promise.all(rows.map(
       item => loader(item)

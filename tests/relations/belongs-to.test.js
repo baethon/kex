@@ -13,10 +13,10 @@ const macro = async (t, options) => {
     scope = undefined
   } = options
 
-  const { kex, testMessage, User } = t.context
+  const { testMessage, User, Message } = t.context
 
   const relation = new BelongsTo('User', foreignKey, otherKey)
-  const dataLoader = relation.createDataLoader('Message', kex, scope)
+  const dataLoader = relation.createDataLoader(Message, scope)
   const expected = await expectedFn(User)
   const actual = await dataLoader(testMessage)
 
@@ -50,7 +50,7 @@ test.serial.before(async t => {
 
   const testMessage = await Message.query().where('text', 'Message #1').firstOrFail()
 
-  Object.assign(t.context, { kex, testMessage, User })
+  Object.assign(t.context, { testMessage, User, Message })
 })
 
 test(macro, {

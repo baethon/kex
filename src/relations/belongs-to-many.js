@@ -36,15 +36,14 @@ class BelongsToMany extends Relation {
   }
 
   /**
-   * @param {String} model
-   * @param {import('../kex')} kex
+   * @param {import('../model').Model} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
-  createDataLoader (model, kex, scope = noop) {
+  createDataLoader (Model, scope = noop) {
     const { options } = this
+    const { kex } = Model
 
-    const Model = kex.getModel(model)
     const foreignPivotKey = options.foreignPivotKey || this.getForeignKeyName(Model)
     const parentKey = options.parentKey || Model.primaryKey
 

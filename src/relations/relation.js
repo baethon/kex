@@ -21,12 +21,11 @@ class Relation {
   }
 
   /**
-   * @param {String} parentModel
-   * @param {import('../kex')} kex
+   * @param {import('../model').Model} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
-  createDataLoader (parentModel, kex, scope) {
+  createDataLoader (Model, scope) {
     throw new KexError('The method createDataLoader() needs to be implemented in the child class')
   }
 }

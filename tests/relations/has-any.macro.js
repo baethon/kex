@@ -9,10 +9,10 @@ module.exports = Relation => {
       scope = undefined
     } = options
 
-    const { kex, Message, users } = t.context
+    const { Message, users, User } = t.context
 
     const relation = new Relation('Message', foreignKey, localKey)
-    const dataLoader = relation.createDataLoader('User', kex, scope)
+    const dataLoader = relation.createDataLoader(User, scope)
     const expected = await expectedFn(Message, users)
       .then(([jon, sansa]) => ({ jon, sansa }))
 

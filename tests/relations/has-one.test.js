@@ -26,7 +26,7 @@ test.serial.before(async t => {
     sansa: await User.query().where('username', 'sansa').firstOrFail()
   }
 
-  Object.assign(t.context, { kex, Message, User, users })
+  Object.assign(t.context, { Message, User, users })
 })
 
 const macro = createMacro(HasOne)

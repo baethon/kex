@@ -22,12 +22,13 @@ class BelongsTo extends Relation {
   }
 
   /**
-   * @param {String} parentModel
-   * @param {import('../kex')} kex
+   * @param {import('../model').Model} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
-  createDataLoader (parentModel, kex, scope = noop) {
+  createDataLoader (Model, scope = noop) {
+    const { kex } = Model
+
     const Related = kex.getModel(this.related)
     const foreignKey = this.foreignKey || this.getForeignKeyName(Related)
     const otherKey = this.otherKey || 'id'
