@@ -1,3 +1,4 @@
+const fromPairs = require('lodash.frompairs')
 const { isObject, noop } = require('../../utils')
 const IncludeScope = require('./include-scope')
 
@@ -58,7 +59,7 @@ const groupIncludes = (includesList) => {
       }
     })
 
-  return Object.fromEntries(groups.entries())
+  return fromPairs(Array.from(groups.entries()))
 }
 
 module.exports = { parseIncludes, groupIncludes }
