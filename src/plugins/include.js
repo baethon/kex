@@ -1,4 +1,5 @@
 const Related = require('./include/related')
+const { parseIncludes } = require('./include/include-parser')
 
 /**
  * @param {import('../model').Model} Model
@@ -7,10 +8,10 @@ module.exports = (Model) => {
   const { QueryBuilder } = Model
   const related = new Related(Model)
 
-  QueryBuilder.prototype.include = function (relations) {
+  QueryBuilder.prototype.include = function (...args) {
     this.includes = {
       ...this.includes,
-      ...relations
+      ...parseIncludes(...args)
     }
 
     return this

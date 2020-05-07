@@ -199,3 +199,59 @@ test.serial('include single relation | nested includes', async t => {
   t.true(messageQuerySpy.calledOnce)
   t.deepEqual(expected, actual)
 })
+
+const includeCompareMacro = async (t, options) => {
+  const { expectedFn, includes } = options
+  const { User } = t.context
+
+  const actualQuery = User.query()
+
+  includes.forEach(include => actualQuery.include(include))
+
+  const expected = await expectedFn(User)
+  const actual = await actualQuery
+
+  t.deepEqual(expected, actual)
+}
+
+test('include as a string', includeCompareMacro, {
+  expectedFn: User => User.query().include({ messages: noop }),
+  includes: [
+    'messages'
+  ]
+})
+
+test('nested includes', includeCompareMacro, {
+  expectedFn: User => User.query().include({
+    messages: qb => {
+      qb.include({ tags: noop })
+    }
+  }),
+  includes: [
+    ['messages', 'messages.tags']
+  ]
+})
+
+test('nested includes | without the root relation', includeCompareMacro, {
+  expectedFn: User => User.query().include({
+    messages: qb => {
+      qb.include({ tags: noop })
+    }
+  }),
+  includes: [
+    ['messages.tags']
+  ]
+})
+
+test('mixed nested includes', includeCompareMacro, {
+  expectedFn: User => User.query().include({
+    messages: qb => {
+      qb.withTrashed()
+      qb.include({ tags: noop })
+    }
+  }),
+  includes: [
+    { messages: qb => qb.withTrashed() },
+    'messages.tags'
+  ]
+})

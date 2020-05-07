@@ -1,4 +1,5 @@
 const { KexError } = require('../../errors')
+const { groupIncludes } = require('./include-parser')
 
 /** @typedef { import('../../model').Model } Model */
 /** @typedef { import('../../query-builder').Scope } Scope */
@@ -17,7 +18,7 @@ class Related {
    * @return {Promise.<Object|Object[]>}
    */
   async fetchRelated (rows, includes) {
-    const entries = Object.entries(includes || {})
+    const entries = Object.entries(groupIncludes(includes || {}))
 
     if (!entries.length) {
       return rows
@@ -30,7 +31,7 @@ class Related {
     // the `fetchSingleRelation()` will return a list of "chunks" - objects that should be merged
     // directly into the corresponding row
     const chunks = await Promise.all(entries.map(
-      ([name, scope]) => this.fetchSingleRelation(rowsToProcess, name, scope)
+      ([name, scope]) => this.fetchSingleRelation(rowsToProcess, name, scope.toScopeFn())
     ))
 
     const combined = rowsToProcess.map((row, i) => {
