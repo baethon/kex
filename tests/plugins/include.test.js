@@ -74,6 +74,29 @@ test.serial('include single relation', async t => {
   t.deepEqual(expected, actual)
 })
 
+test('include single relation | single row', async t => {
+  const { User, Message } = t.context
+  const expected = await User.query()
+    .first()
+    .then(async user => {
+      const messages = await Message.query()
+        .fromUser(user)
+
+      return ({
+        ...user,
+        messages
+      })
+    })
+
+  const actual = await User.query()
+    .include({
+      messages: noop
+    })
+    .first()
+
+  t.deepEqual(expected, actual)
+})
+
 test('include single relation | modify related query', async t => {
   const { User, Message } = t.context
   const expected = await User.query()
