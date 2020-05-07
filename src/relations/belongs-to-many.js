@@ -60,7 +60,7 @@ class BelongsToMany extends Relation {
           `${Related.tableName}.*`,
           `${table}.${foreignPivotKey} AS pivot__foreign_id`
         )
-        .whereIn('pivot__foreign_id', keys)
+        .whereIn(`${table}.${foreignPivotKey}`, keys)
 
       scope(query)
 
