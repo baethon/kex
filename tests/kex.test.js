@@ -2,7 +2,6 @@ const test = require('ava')
 const sinon = require('sinon')
 const setupDb = require('./setup-db')
 const { createKex } = require('./utils')
-const modelUtils = require('../src/model')
 
 setupDb()
 
@@ -17,17 +16,13 @@ test('pass created model to plugins handler', t => {
     ]
   })
 
-  const modelOptions = {
-    hello: 'there!'
-  }
+  const User = kex.createModel('User')
 
-  const User = kex.createModel('User', modelOptions)
-
-  t.true(firstPlugin.calledWith(sinon.match.same(User), modelOptions))
-  t.true(secondPlugin.calledWith(sinon.match.same(User), modelOptions))
+  t.true(firstPlugin.calledWith(sinon.match.same(User)))
+  t.true(secondPlugin.calledWith(sinon.match.same(User)))
 })
 
-test.serial('merge default options with model options', t => {
+test('merge default options with model options', t => {
   const kex = createKex(t, {
     modelDefaults: {
       hello: 'there!',
@@ -36,23 +31,19 @@ test.serial('merge default options with model options', t => {
     }
   })
 
-  const spy = sinon.spy(modelUtils, 'createModel')
-
-  kex.createModel('User', {
+  const User = kex.createModel('User', {
     softDeletes: true,
     nested: { enabled: false }
   })
 
-  modelUtils.createModel.restore()
-
-  t.true(spy.calledWith(kex, 'User', {
+  t.deepEqual(User.options, {
     hello: 'there!',
     softDeletes: true,
     nested: { enabled: false }
-  }))
+  })
 })
 
-test.serial('merge default options with model options | ignore selected options', t => {
+test('merge default options with model options | ignore selected options', t => {
   const kex = createKex(t, {
     modelDefaults: {
       tableName: 'foo',
@@ -60,11 +51,7 @@ test.serial('merge default options with model options | ignore selected options'
     }
   })
 
-  const spy = sinon.spy(modelUtils, 'createModel')
+  const User = kex.createModel('User')
 
-  kex.createModel('User')
-
-  modelUtils.createModel.restore()
-
-  t.true(spy.calledWith(kex, 'User', {}))
+  t.deepEqual(User.options, {})
 })

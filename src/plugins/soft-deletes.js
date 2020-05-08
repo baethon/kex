@@ -6,11 +6,10 @@ const { isObject } = require('../utils')
  */
 
 /**
- * @param {import('../model').Model} Model
- * @param {import('../kex').ModelOptions} options
+ * @param {import('../model')} Model
  */
-module.exports = (Model, options) => {
-  const { softDeletes = false } = options
+module.exports = (Model) => {
+  const { softDeletes = false } = Model.options
 
   if (!softDeletes) {
     return
@@ -24,47 +23,57 @@ module.exports = (Model, options) => {
     qb.whereNull(columnName)
   })
 
-  Model.QueryBuilder.addScope('withTrashed', qb => {
+  Model.addScope('withTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
   })
 
-  Model.QueryBuilder.addScope('onlyTrashed', qb => {
+  Model.addScope('onlyTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
     qb.whereNotNull(columnName)
   })
 
-  Model.QueryBuilder.prototype.trash = function (ret) {
-    this.update({ [columnName]: new Date() })
+  Model.QueryBuilder.extend({
+    methodName: 'trash',
+    fn (ret) {
+      this.update({ [columnName]: new Date() })
 
-    if (ret) {
-      this.returning(ret)
+      if (ret) {
+        this.returning(ret)
+      }
+
+      return this
     }
-
-    return this
-  }
+  })
 
   const { delete: deleteMethod } = Model.QueryBuilder.prototype
 
-  Model.QueryBuilder.prototype.delete = function (ret, options = {}) {
-    const returning = isObject(ret)
-      ? undefined
-      : ret
+  Model.QueryBuilder.extend({
+    methodName: 'delete',
+    force: true,
+    fn (ret, options = {}) {
+      const returning = isObject(ret)
+        ? undefined
+        : ret
 
-    const { trash = true } = isObject(ret)
-      ? ret
-      : options
+      const { trash = true } = isObject(ret)
+        ? ret
+        : options
 
-    if (trash) {
-      return this.trash(returning)
+      if (trash) {
+        return this.trash(returning)
+      }
+
+      return deleteMethod.call(this, returning)
     }
+  })
 
-    return deleteMethod.call(this, returning)
-  }
-
-  Model.QueryBuilder.prototype.restore = function () {
-    return this.withoutGlobalScope('soft-deletes')
-      .update({
-        [columnName]: null
-      })
-  }
+  Model.QueryBuilder.extend({
+    methodName: 'restore',
+    fn () {
+      return this.withoutGlobalScope('soft-deletes')
+        .update({
+          [columnName]: null
+        })
+    }
+  })
 }

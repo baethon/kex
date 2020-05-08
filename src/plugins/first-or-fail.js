@@ -1,18 +1,19 @@
 const { ModelNotFound } = require('../errors')
 
 /**
- * @param {import('../model').Model} Model
- * @param {import('../kex').ModelOptions} options
+ * @param {import('../model')} Model
  */
-module.exports = (Model, options) => {
-  Model.QueryBuilder.prototype.firstOrFail = function (columns) {
-    return this.first(columns)
-      .then(model => {
-        if (!model) {
-          throw ModelNotFound.firstOrFail(Model)
-        }
+module.exports = (Model) => {
+  Model.QueryBuilder.extend({
+    methodName: 'firstOrFail',
+    async fn (columns) {
+      const model = await this.first(columns)
 
-        return model
-      })
-  }
+      if (!model) {
+        throw ModelNotFound.firstOrFail(Model)
+      }
+
+      return model
+    }
+  })
 }

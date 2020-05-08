@@ -1,9 +1,6 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
-
-const toScope = (fn) => function (...args) {
-  fn(this, ...args)
-  return this
-}
+const { KexError } = require('./errors')
+const { toScope } = require('./utils')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 
@@ -11,6 +8,13 @@ const toScope = (fn) => function (...args) {
  * @callback Scope
  * @param {QueryBuilder} qb
  * @param {...*} args
+ */
+
+/**
+ * @typedef {Object} ExtendOptions
+ * @property {String} methodName
+ * @property {Function} fn
+ * @property {Boolean} [force=false]
  */
 
 class QueryBuilder extends BaseQueryBuilder {
@@ -42,42 +46,6 @@ class QueryBuilder extends BaseQueryBuilder {
   }
 
   /**
-   * Set list of query scopes
-   *
-   * @param {Object<String, Scope>} scopesList
-   * @return {QueryBuilder}
-   */
-  static setScopes (scopesList) {
-    Object.entries(scopesList)
-      .forEach(([name, fn]) => this.addScope(name, fn))
-
-    return this
-  }
-
-  /**
-   * Set list of models global scopes
-   *
-   * @param {Object<String, Scope>} scopesList
-   * @return {QueryBuilder}
-   */
-  static setGlobalScopes (scopesList) {
-    Object.entries(scopesList)
-      .forEach(([name, fn]) => this.addGlobalScope(name, fn))
-
-    return this
-  }
-
-  /**
-   * Add a query scope to the model
-   *
-   * @param {String} name
-   * @param {Scope} fn
-   */
-  static addScope (name, fn) {
-    this.prototype[name] = toScope(fn)
-  }
-
-  /**
    * Add a global scope to the model
    *
    * @param {String} name
@@ -85,6 +53,19 @@ class QueryBuilder extends BaseQueryBuilder {
    */
   static addGlobalScope (name, fn) {
     this.globalScopes[name] = toScope(fn)
+  }
+
+  /**
+   * @param {ExtendOptions} options
+   */
+  static extend (options) {
+    const { methodName, fn, force = false } = options
+
+    if (!force && methodName in this.prototype) {
+      throw new KexError(`Method [${methodName}] is already defined in QueryBuilder`)
+    }
+
+    this.prototype[methodName] = fn
   }
 
   /**
@@ -140,23 +121,19 @@ class QueryBuilder extends BaseQueryBuilder {
 /**
  * Create the a new child class of QueryBuilder
  *
- * @param {String} tableName
- * @param {Object} options
- * @returns {QueryBuilder}
+ * @param {import('./model')} Model
+ * @returns {typeof QueryBuilder}
  */
-const createChildClass = (tableName, options) => {
-  const { scopes = {}, globalScopes = {} } = options
-
+const createChildClass = (Model) => {
   class ChildQueryBuilder extends QueryBuilder {
     static get tableName () {
-      return tableName
+      return Model.tableName
     }
   }
 
   ChildQueryBuilder.globalScopes = {}
 
-  return ChildQueryBuilder.setScopes(scopes)
-    .setGlobalScopes(globalScopes)
+  return ChildQueryBuilder
 }
 
 module.exports = { createChildClass }

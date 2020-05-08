@@ -3,7 +3,7 @@ const pluralize = require('pluralize')
 const Relation = require('./relation')
 const { mapToMany, prop, noop, omit } = require('../utils')
 
-/** @typedef {import('../model').Model} Model */
+/** @typedef {import('../model')} Model */
 
 /**
  * @typedef {Object} Options
@@ -36,7 +36,7 @@ class BelongsToMany extends Relation {
   }
 
   /**
-   * @param {import('../model').Model} Model
+   * @param {import('../model')} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */

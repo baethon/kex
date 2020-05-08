@@ -57,11 +57,17 @@ const mapToMany = (keys, keyFn) => (rows) => {
  */
 const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
 
+const toScope = (fn) => function (...args) {
+  fn(this, ...args)
+  return this
+}
+
 module.exports = {
   omit,
   mapTo,
   mapToMany,
   isObject,
   prop: name => item => item[name],
-  noop: () => {}
+  noop: () => {},
+  toScope
 }

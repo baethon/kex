@@ -1,7 +1,7 @@
 const { KexError } = require('../../errors')
 const { groupIncludes } = require('./parser')
 
-/** @typedef { import('../../model').Model } Model */
+/** @typedef { import('../../model') } Model */
 /** @typedef { import('../../query-builder').Scope } Scope */
 
 class Related {

@@ -1,13 +1,13 @@
-const modelUtils = require('./model')
+const Model = require('./model')
 const { omit } = require('./utils')
-const builtinPlugins = require('./plugins')
+const pluginUtils = require('./plugins')
 const { KexError } = require('./errors')
 
 /** @typedef { import('knex/lib/query/builder') } Knex */
 /** @typedef { import('./query-builder').Scope } Scope */
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
-/** @typedef { import('./model').Model } Model */
-/** @typedef { import('./relations/relation') } Relation */
+/** @typedef { import('./model') } Model */
+/** @typedef { import('./model').ModelOptions } ModelOptions */
 
 /**
  * @type {Object} ModelDefaultOptions
@@ -16,18 +16,6 @@ const { KexError } = require('./errors')
  * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
- */
-
-/**
- * @typedef {Object} ModelOptions
- * @property {String} [tableName]
- * @property {String} [primaryKey=id]
- * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
- * @property {Object.<String, Object>} [relations]
- * @property {PluginFactory[]} [plugins]
- * @property {Object.<String,Scope>} [scopes]
- * @property {Object.<String,Scope>} [globalScopes]
- * @property {Object.<String,Relation>} [relations]
  */
 
 /**
@@ -85,12 +73,13 @@ class Kex {
       ...options
     }
 
-    const modelPlugins = [
-      ...builtinPlugins,
-      ...plugins
-    ]
-    const Model = modelUtils.createModel(this, name, useOptions)
-    this.models[name] = modelUtils.applyPlugins(modelPlugins, Model, useOptions)
+    this.models[name] = pluginUtils.applyPlugins(
+      [
+        ...pluginUtils.builtinPlugins,
+        ...plugins
+      ],
+      new Model(this, name, useOptions)
+    )
 
     return this.models[name]
   }

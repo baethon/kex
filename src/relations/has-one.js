@@ -22,7 +22,7 @@ class HasOne extends Relation {
   }
 
   /**
-   * @param {import('../model').Model} Model
+   * @param {import('../model')} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
