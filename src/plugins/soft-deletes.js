@@ -24,16 +24,16 @@ module.exports = (Model, options) => {
     qb.whereNull(columnName)
   })
 
-  Model.QueryBuilder.addScope('withTrashed', qb => {
+  Model.addScope('withTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
   })
 
-  Model.QueryBuilder.addScope('onlyTrashed', qb => {
+  Model.addScope('onlyTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
     qb.whereNotNull(columnName)
   })
 
-  Model.QueryBuilder.prototype.trash = function (ret) {
+  Model.QueryBuilder.addMacro('trash', function (ret) {
     this.update({ [columnName]: new Date() })
 
     if (ret) {
@@ -41,11 +41,11 @@ module.exports = (Model, options) => {
     }
 
     return this
-  }
+  })
 
   const { delete: deleteMethod } = Model.QueryBuilder.prototype
 
-  Model.QueryBuilder.prototype.delete = function (ret, options = {}) {
+  Model.QueryBuilder.addMacro('delete', function (ret, options = {}) {
     const returning = isObject(ret)
       ? undefined
       : ret
@@ -59,12 +59,12 @@ module.exports = (Model, options) => {
     }
 
     return deleteMethod.call(this, returning)
-  }
+  }, { force: true })
 
-  Model.QueryBuilder.prototype.restore = function () {
+  Model.QueryBuilder.addMacro('restore', function () {
     return this.withoutGlobalScope('soft-deletes')
       .update({
         [columnName]: null
       })
-  }
+  })
 }

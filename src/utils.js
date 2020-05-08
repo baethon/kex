@@ -74,6 +74,11 @@ const frozenProperties = (object, properties) => {
   return object
 }
 
+const toScope = (fn) => function (...args) {
+  fn(this, ...args)
+  return this
+}
+
 module.exports = {
   omit,
   mapTo,
@@ -81,5 +86,6 @@ module.exports = {
   isObject,
   prop: name => item => item[name],
   noop: () => {},
-  frozenProperties
+  frozenProperties,
+  toScope
 }

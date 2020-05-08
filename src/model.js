@@ -1,7 +1,8 @@
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const QueryBuilder = require('./query-builder')
-const { frozenProperties } = require('./utils')
+const { frozenProperties, toScope } = require('./utils')
+const { KexError } = require('./errors')
 
 const getTableName = (modelName, { tableName }) => {
   return tableName || snakeCase(pluralize.plural(modelName))
@@ -15,6 +16,8 @@ const getTableName = (modelName, { tableName }) => {
  * @typedef {Object} Model
  * @property {QueryBuilder} QueryBuilder
  * @property {Function} query create new query
+ * @property {Function} addScope add new scope
+ * @property {Function} addQueryMacro add new query macro
  * @property {String} name name of the model
  * @property {Kex} kex
  * @property {String} tableName
@@ -30,17 +33,42 @@ const getTableName = (modelName, { tableName }) => {
  * @param {ModelOptions} options
  * @return {Model}
  */
-const createModel = (kex, name, options) => {
+const createModel = (kex, name, options = {}) => {
   const tableName = getTableName(name, options)
   const builder = QueryBuilder.createChildClass(tableName, options)
   const Model = {
     query () {
       const { knex } = this.kex
       return this.QueryBuilder.create(knex.client)
+    },
+
+    addQueryMacro (name, fn) {
+      if (name in this) {
+        throw new KexError(`Method [${name}] is already defined in Model`)
+      }
+
+      this.QueryBuilder.addMacro(name, fn)
+      this[name] = (...args) => {
+        const query = this.query()
+        return query[name](...args)
+      }
+
+      return this
+    },
+
+    addScope (name, scopeFn) {
+      return this.addQueryMacro(name, toScope(scopeFn))
+    },
+
+    setScopes (scopesList) {
+      Object.entries(scopesList)
+        .forEach(([name, fn]) => this.addScope(name, fn))
+
+      return this
     }
   }
 
-  return frozenProperties(Model, {
+  frozenProperties(Model, {
     QueryBuilder: builder,
     primaryKey: options.primaryKey || 'id',
     name,
@@ -48,6 +76,10 @@ const createModel = (kex, name, options) => {
     tableName,
     options
   })
+
+  const { scopes = {} } = options
+
+  return Model.setScopes(scopes)
 }
 
 /**
