@@ -8,6 +8,7 @@ const { KexError } = require('./errors')
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
 /** @typedef { import('./model') } Model */
 /** @typedef { import('./model').ModelOptions } ModelOptions */
+/** @typedef { import('./model').KnexClientResolver } KnexClientResolver */
 
 /**
  * @type {Object} ModelDefaultOptions
@@ -16,6 +17,7 @@ const { KexError } = require('./errors')
  * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
+ * @property {KnexClientResolver} [knexClientResolver]
  */
 
 /**

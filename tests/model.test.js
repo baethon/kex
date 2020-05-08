@@ -1,4 +1,5 @@
 const test = require('ava')
+const sinon = require('sinon')
 const setupDb = require('./setup-db')
 const { createKex } = require('./utils')
 const Model = require('../src/model')
@@ -61,4 +62,21 @@ test('extend() | add query proxy', t => {
 
   t.is(result, Foo.test())
   t.is(result, Foo.query().test())
+})
+
+test.serial('use custom query resolver', t => {
+  const { kex } = t.context
+  const client = Symbol('fake knex client')
+
+  const Foo = new Model(kex, 'Foo', {
+    knexClientResolver () {
+      return client
+    }
+  })
+
+  const spy = sinon.spy(Foo.QueryBuilder, 'create')
+  Foo.query()
+  spy.restore()
+
+  t.true(spy.calledWith(client))
 })
