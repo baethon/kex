@@ -41,7 +41,7 @@ test('build model instance | custom primary key', t => {
   t.is('my_foo', Foo.primaryKey)
 })
 
-test('addQueryMacro()', t => {
+test('extend() | add query proxy', t => {
   const { kex } = t.context
   const Foo = new Model(kex, 'Foo')
 
