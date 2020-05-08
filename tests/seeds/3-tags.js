@@ -1,4 +1,4 @@
-const tags = 'voluptatem accusantium doloremque laudantium totam righteous indignation'.split(' ')
+const tags = 'voluptatem accusantium doloremque laudantium totam common-1 common-2'.split(' ')
 
 const flatten = list => Array.prototype.concat.apply([], list)
 const shuffleArray = (array) => {
@@ -59,7 +59,9 @@ module.exports = {
     /** @type {Object[]} */
     const createdTags = await knex.table('tags')
       .insert(tags.map(title => ({ title })))
-      .then(() => knex.table('tags'))
+      .then(() => knex.table('tags')
+        .orderBy('id', 'asc')
+      )
 
     const commonTags = createdTags.splice(-2)
 

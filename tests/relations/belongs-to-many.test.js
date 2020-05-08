@@ -2,7 +2,7 @@ const test = require('ava')
 const sinon = require('sinon')
 const { BelongsToMany } = require('../../src/relations')
 const setupDb = require('../setup-db')
-const { createKex } = require('../utils')
+const { createKex, compareDbResults } = require('../utils')
 
 setupDb()
 
@@ -24,7 +24,7 @@ const fetchUsersTagsMacro = async (t, options) => {
   const relation = new BelongsToMany('Tag', relationOptions)
 
   const spy = sinon.spy(Tag, 'query')
-  const dataLoader = relation.createDataLoader(User)
+  const dataLoader = relation.createDataLoader(User, qb => qb.orderBy('tags.id', 'asc'))
 
   const users = await User.query()
     .then(users => users.reduce(
@@ -48,7 +48,7 @@ const fetchUsersTagsMacro = async (t, options) => {
     .then(([jon, sansa]) => ({ jon, sansa }))
 
   t.true(spy.calledOnce)
-  t.deepEqual(expected, actual)
+  compareDbResults(t, expected, actual)
 }
 
 /**
@@ -62,7 +62,7 @@ const fetchTagsUsersMacro = async (t, options) => {
   const relation = new BelongsToMany('User', options)
 
   const dataLoader = relation.createDataLoader(Tag)
-  const tags = await Tag.query().whereIn('title', ['righteous', 'indignation'])
+  const tags = await Tag.query().whereIn('title', ['common-1', 'common-2'])
   const users = await User.query()
 
   const spy = sinon.spy(User, 'query')
@@ -77,7 +77,7 @@ const fetchTagsUsersMacro = async (t, options) => {
   const expected = [users, users]
 
   t.true(spy.calledOnce)
-  t.deepEqual(expected, actual)
+  compareDbResults(t, expected, actual)
 }
 
 test.serial('fetch users tags', fetchUsersTagsMacro, {
