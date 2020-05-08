@@ -67,7 +67,7 @@ class Kex {
    * @param {String} name
    * @param {ModelOptions} options
    * @return {Model}
-   * @throws KexError
+   * @throws {KexError}
    */
   createModel (name, options = {}) {
     if (name in this.models) {
@@ -95,22 +95,9 @@ class Kex {
   }
 
   /**
-   * Remove model from the Kex instance
-   *
-   * This should be used probably only for testing.
-   *
-   * @param {String} name
-   * @return {Kex}
-   */
-  unloadModel (name) {
-    delete this.models[name]
-    return this
-  }
-
-  /**
    * @param {String} name
    * @return {Model}
-   * @throws KexError
+   * @throws {KexError}
    */
   getModel (name) {
     if (name in this.models) {
