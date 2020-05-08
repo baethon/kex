@@ -28,6 +28,11 @@ const { KexError } = require('./errors')
  *                                        be proxied to the QueryBuilder?
  */
 
+const proxyQueryMethods = [
+  'where',
+  'insert'
+]
+
 class Model {
   /**
    * @param {import('./kex')} kex
@@ -114,5 +119,12 @@ class Model {
     this.booted = true
   }
 }
+
+proxyQueryMethods.forEach(name => {
+  Model.prototype[name] = function (...args) {
+    const query = this.query()
+    return query[name](...args)
+  }
+})
 
 module.exports = Model
