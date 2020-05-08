@@ -2,7 +2,8 @@ const test = require('ava')
 const sinon = require('sinon')
 const { BelongsToMany } = require('../../src/relations')
 const setupDb = require('../setup-db')
-const { createKex, compareDbResults } = require('../utils')
+const { createKex } = require('../utils')
+const { compareDbResults } = require('../assertions')
 
 setupDb()
 
