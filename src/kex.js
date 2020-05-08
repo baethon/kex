@@ -9,6 +9,7 @@ const { KexError } = require('./errors')
 /** @typedef { import('./model') } Model */
 /** @typedef { import('./model').ModelOptions } ModelOptions */
 /** @typedef { import('./model').KnexClientResolver } KnexClientResolver */
+/** @typedef { import('./model').TimestampsOptions } TimestampsOptions */
 
 /**
  * @type {Object} ModelDefaultOptions
@@ -18,6 +19,7 @@ const { KexError } = require('./errors')
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
  * @property {KnexClientResolver} [knexClientResolver]
+ * @property {Boolean|TimestampsOptions} [timestamps=false]
  */
 
 /**

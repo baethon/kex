@@ -15,6 +15,12 @@ const { KexError } = require('./errors')
  */
 
 /**
+ * @typedef {Object} TimestampsOptions
+ * @property {String} [deletedAtColumn=deleted_at]
+ * @property {String} [updatedAtColumn=updated_at]
+ */
+
+/**
  * @typedef {Object} ModelOptions
  * @property {String} [tableName]
  * @property {String} [primaryKey=id]
@@ -25,12 +31,14 @@ const { KexError } = require('./errors')
  * @property {Object.<String,Scope>} [globalScopes]
  * @property {Object.<String,Relation>} [relations]
  * @property {KnexClientResolver} [knexClientResolver]
+ * @property {Boolean|TimestampsOptions} [timestamps=false]
  */
 
 /**
  * @typedef {Object} ExtendOptions
  * @property {String} methodName
  * @property {Function} fn
+ * @property {Boolean} [force=false]
  * @property {Boolean} [queryProxy=false] should the function
  *                                        be proxied to the QueryBuilder?
  */
