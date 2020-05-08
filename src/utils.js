@@ -57,11 +57,29 @@ const mapToMany = (keys, keyFn) => (rows) => {
  */
 const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
 
+/**
+ * Set frozen properties in given object
+ *
+ * @param {Object} objects
+ * @param {Object} properties
+ * @return {Object}
+ */
+const frozenProperties = (object, properties) => {
+  Object.entries(properties)
+    .forEach(([name, value]) => Object.defineProperty(object, name, {
+      get: () => value,
+      configurable: false
+    }))
+
+  return object
+}
+
 module.exports = {
   omit,
   mapTo,
   mapToMany,
   isObject,
   prop: name => item => item[name],
-  noop: () => {}
+  noop: () => {},
+  frozenProperties
 }

@@ -1,6 +1,7 @@
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const QueryBuilder = require('./query-builder')
+const { frozenProperties } = require('./utils')
 
 const getTableName = (modelName, { tableName }) => {
   return tableName || snakeCase(pluralize.plural(modelName))
@@ -32,37 +33,21 @@ const getTableName = (modelName, { tableName }) => {
 const createModel = (kex, name, options) => {
   const tableName = getTableName(name, options)
   const builder = QueryBuilder.createChildClass(tableName, options)
-
-  return {
-    get QueryBuilder () {
-      return builder
-    },
-
-    get name () {
-      return name
-    },
-
-    get kex () {
-      return kex
-    },
-
-    get tableName () {
-      return tableName
-    },
-
-    get primaryKey () {
-      return options.primaryKey || 'id'
-    },
-
-    get options () {
-      return options
-    },
-
+  const Model = {
     query () {
       const { knex } = this.kex
       return this.QueryBuilder.create(knex.client)
     }
   }
+
+  return frozenProperties(Model, {
+    QueryBuilder: builder,
+    primaryKey: options.primaryKey || 'id',
+    name,
+    kex,
+    tableName,
+    options
+  })
 }
 
 /**
