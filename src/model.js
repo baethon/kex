@@ -30,7 +30,8 @@ const { KexError } = require('./errors')
 
 const proxyQueryMethods = [
   'where',
-  'insert'
+  'insert',
+  'returning'
 ]
 
 class Model {

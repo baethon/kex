@@ -32,3 +32,8 @@ test('insert()', proxyMacro, {
   expectedFn: User => User.query().insert({ active: true }),
   actualFn: User => User.insert({ active: true })
 })
+
+test('returning()', proxyMacro, {
+  expectedFn: User => User.query().returning('id').insert({ active: true }),
+  actualFn: User => User.returning('id').insert({ active: true })
+})
