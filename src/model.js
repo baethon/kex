@@ -1,107 +1,118 @@
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const QueryBuilder = require('./query-builder')
-const { frozenProperties, toScope } = require('./utils')
+const { toScope } = require('./utils')
 const { KexError } = require('./errors')
 
-const getTableName = (modelName, { tableName }) => {
-  return tableName || snakeCase(pluralize.plural(modelName))
-}
-
-/** @typedef { import('./kex') } Kex */
-/** @typedef { import('./kex').ModelOptions } ModelOptions */
-/** @typedef { import('./query-builder').QueryBuilder } QueryBuilder */
+/** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
+/** @typedef { import('./relations/relation') } Relation */
+/** @typedef { import('./query-builder').Scope } Scope */
 
 /**
- * @typedef {Object} Model
- * @property {QueryBuilder} QueryBuilder
- * @property {Function} query create new query
- * @property {Function} addScope add new scope
- * @property {Function} addQueryMacro add new query macro
- * @property {String} name name of the model
- * @property {Kex} kex
- * @property {String} tableName
- * @property {String} primaryKey
- * @property {ModelOptions} options
+ * @typedef {Object} ModelOptions
+ * @property {String} [tableName]
+ * @property {String} [primaryKey=id]
+ * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Object.<String, Object>} [relations]
+ * @property {PluginFactory[]} [plugins]
+ * @property {Object.<String,Scope>} [scopes]
+ * @property {Object.<String,Scope>} [globalScopes]
+ * @property {Object.<String,Relation>} [relations]
  */
 
 /**
- * Create the model object
- *
- * @param {Kex} kex
- * @param {String} name
- * @param {ModelOptions} options
- * @return {Model}
+ * @typedef {Object} ExtendOptions
+ * @property {String} methodName
+ * @property {Function} fn
+ * @property {Boolean} [queryProxy=false] should the function
+ *                                        be proxied to the QueryBuilder?
  */
-const createModel = (kex, name, options = {}) => {
-  const tableName = getTableName(name, options)
-  const builder = QueryBuilder.createChildClass(tableName, options)
-  const Model = {
-    query () {
-      const { knex } = this.kex
-      return this.QueryBuilder.create(knex.client)
-    },
 
-    addQueryMacro (name, fn) {
-      if (name in this) {
-        throw new KexError(`Method [${name}] is already defined in Model`)
-      }
+class Model {
+  /**
+   * @param {import('./kex')} kex
+   * @param {String} name
+   * @param {ModelOptions} options
+   */
+  constructor (kex, name, options = {}) {
+    this.name = name
+    this.kex = kex
+    this.options = options
+    this.QueryBuilder = QueryBuilder.createChildClass(this)
+    this.booted = false
+  }
 
-      this.QueryBuilder.addMacro(name, fn)
-      this[name] = (...args) => {
+  get tableName () {
+    const { tableName } = this.options
+    return tableName || snakeCase(pluralize.plural(this.name))
+  }
+
+  get primaryKey () {
+    const { primaryKey } = this.options
+    return primaryKey || 'id'
+  }
+
+  query () {
+    this.bootIfNotBooted()
+
+    const { knex } = this.kex
+    return this.QueryBuilder.create(knex.client)
+  }
+
+  /**
+   * @param {ExtendOptions} options
+   */
+  extend (options) {
+    const { methodName, fn, queryProxy = false } = options
+
+    if (this[methodName]) {
+      throw new KexError(`Can't overwrite method [${methodName}] in ${this.name} model`)
+    }
+
+    if (queryProxy) {
+      this.QueryBuilder.extend({ methodName, fn })
+      this[methodName] = (...args) => {
         const query = this.query()
-        return query[name](...args)
+        return query[methodName](...args)
       }
-
-      return this
-    },
-
-    addScope (name, scopeFn) {
-      return this.addQueryMacro(name, toScope(scopeFn))
-    },
-
-    setScopes (scopesList) {
-      Object.entries(scopesList)
-        .forEach(([name, fn]) => this.addScope(name, fn))
-
-      return this
+    } else {
+      this[methodName] = (...args) => {
+        return fn.call(this, ...args)
+      }
     }
   }
 
-  frozenProperties(Model, {
-    QueryBuilder: builder,
-    primaryKey: options.primaryKey || 'id',
-    name,
-    kex,
-    tableName,
-    options
-  })
+  addScope (name, fn) {
+    this.extend({
+      methodName: name,
+      fn: toScope(fn),
+      queryProxy: true
+    })
 
-  const { scopes = {} } = options
+    return this
+  }
 
-  return Model.setScopes(scopes)
+  /**
+   * @private
+   */
+  bootIfNotBooted () {
+    if (this.booted) {
+      return
+    }
+
+    const {
+      scopes = {},
+      globalScopes = {}
+    } = this.options
+
+    Object.entries(scopes)
+      .forEach(([name, fn]) => this.addScope(name, fn))
+
+    Object.entries(globalScopes)
+      .forEach(([name, fn]) => this.QueryBuilder.addGlobalScope(name, fn))
+
+    this.booted = true
+  }
 }
 
-/**
- * @callback PluginFactory
- * @param {Model} Model
- * @param {Object} options
- */
-
-/**
- * Apply the list of plugins to the Model
- *
- * @param {PluginFactory[]} plugins
- * @param {Model} Model
- * @param {Object} options
- * @return {Model}
- */
-const applyPlugins = function (plugins, Model, options) {
-  plugins.forEach(fn => {
-    fn(Model, options)
-  })
-
-  return Model
-}
-
-module.exports = { createModel, applyPlugins }
+module.exports = Model

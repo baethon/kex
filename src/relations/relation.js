@@ -2,7 +2,7 @@ const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const { KexError } = require('../errors')
 
-/** @typedef {import('../model').Model} Model */
+/** @typedef {import('../model')} Model */
 
 /**
  * @callback DataLoader
@@ -21,7 +21,7 @@ class Relation {
   }
 
   /**
-   * @param {import('../model').Model} Model
+   * @param {import('../model')} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */

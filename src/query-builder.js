@@ -10,6 +10,13 @@ const { toScope } = require('./utils')
  * @param {...*} args
  */
 
+/**
+ * @typedef {Object} ExtendOptions
+ * @property {String} methodName
+ * @property {Function} fn
+ * @property {Boolean} [force=false]
+ */
+
 class QueryBuilder extends BaseQueryBuilder {
   /**
    * Create instance of QueryBuilder
@@ -39,19 +46,6 @@ class QueryBuilder extends BaseQueryBuilder {
   }
 
   /**
-   * Set list of models global scopes
-   *
-   * @param {Object<String, Scope>} scopesList
-   * @return {QueryBuilder}
-   */
-  static setGlobalScopes (scopesList) {
-    Object.entries(scopesList)
-      .forEach(([name, fn]) => this.addGlobalScope(name, fn))
-
-    return this
-  }
-
-  /**
    * Add a global scope to the model
    *
    * @param {String} name
@@ -61,14 +55,17 @@ class QueryBuilder extends BaseQueryBuilder {
     this.globalScopes[name] = toScope(fn)
   }
 
-  static addMacro (name, fn, options = {}) {
-    const { force = false } = options
+  /**
+   * @param {ExtendOptions} options
+   */
+  static extend (options) {
+    const { methodName, fn, force = false } = options
 
-    if (!force && name in this.prototype) {
-      throw new KexError(`Method [${name}] is already defined in QueryBuilder`)
+    if (!force && methodName in this.prototype) {
+      throw new KexError(`Method [${methodName}] is already defined in QueryBuilder`)
     }
 
-    this.prototype[name] = fn
+    this.prototype[methodName] = fn
   }
 
   /**
@@ -124,22 +121,19 @@ class QueryBuilder extends BaseQueryBuilder {
 /**
  * Create the a new child class of QueryBuilder
  *
- * @param {String} tableName
- * @param {Object} options
- * @returns {QueryBuilder}
+ * @param {import('./model')} Model
+ * @returns {typeof QueryBuilder}
  */
-const createChildClass = (tableName, options) => {
-  const { globalScopes = {} } = options
-
+const createChildClass = (Model) => {
   class ChildQueryBuilder extends QueryBuilder {
     static get tableName () {
-      return tableName
+      return Model.tableName
     }
   }
 
   ChildQueryBuilder.globalScopes = {}
 
-  return ChildQueryBuilder.setGlobalScopes(globalScopes)
+  return ChildQueryBuilder
 }
 
 module.exports = { createChildClass }
