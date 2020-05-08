@@ -2,7 +2,8 @@ const builtinPlugins = [
   require('./find'),
   require('./first-or-fail'),
   require('./soft-deletes'),
-  require('./include')
+  require('./include'),
+  require('./timestamps')
 ]
 
 /**
