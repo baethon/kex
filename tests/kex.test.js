@@ -28,7 +28,6 @@ test('pass created model to plugins handler', t => {
 })
 
 test.serial('merge default options with model options', t => {
-  const { knex } = t.context
   const kex = createKex(t, {
     modelDefaults: {
       hello: 'there!',
@@ -46,7 +45,7 @@ test.serial('merge default options with model options', t => {
 
   modelUtils.createModel.restore()
 
-  t.true(spy.calledWith(knex, 'User', {
+  t.true(spy.calledWith(kex, 'User', {
     hello: 'there!',
     softDeletes: true,
     nested: { enabled: false }
@@ -54,7 +53,6 @@ test.serial('merge default options with model options', t => {
 })
 
 test.serial('merge default options with model options | ignore selected options', t => {
-  const { knex } = t.context
   const kex = createKex(t, {
     modelDefaults: {
       tableName: 'foo',
@@ -68,5 +66,5 @@ test.serial('merge default options with model options | ignore selected options'
 
   modelUtils.createModel.restore()
 
-  t.true(spy.calledWith(knex, 'User', {}))
+  t.true(spy.calledWith(kex, 'User', {}))
 })

@@ -1,7 +1,10 @@
 const { ModelNotFound } = require('../errors')
 
-module.exports = (Model, options) => {
-  const { primaryKey = 'id' } = options
+/**
+ * @param {import('../model').Model} Model
+ */
+module.exports = (Model) => {
+  const { primaryKey } = Model
 
   Model.find = function (id) {
     return this.query()

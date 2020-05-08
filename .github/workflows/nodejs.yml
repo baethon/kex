@@ -55,4 +55,24 @@ jobs:
       env:
         DB_CLIENT: pg
         DB_URL: 'postgres://postgres:postgres@postgres:5432/postgres'
+  test_mysql:
+    runs-on: ubuntu-latest
+    container: node:12-alpine
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: test
+          MYSQL_USER: mysql
+          MYSQL_PASSWORD: mysql
+          MYSQL_RANDOM_ROOT_PASSWORD: yes
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v2
+    - run: yarn
+    - run: yarn add mysql
+    - run: yarn test
+      env:
+        DB_CLIENT: mysql
+        DB_URL: 'mysql://mysql:mysql@mysql:3306/test'
 

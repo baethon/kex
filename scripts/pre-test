@@ -5,7 +5,8 @@ const knex = require('knex')
 
 const connection = knex(require('../tests/knexfile'))
 
-connection.migrate.latest()
+connection.migrate.rollback(null, true)
+  .then(() => connection.migrate.latest())
   .then(() => connection.seed.run())
   .then(() => {
     console.log('Successfully migrated & seeded the database')

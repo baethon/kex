@@ -1,8 +1,45 @@
 const modelUtils = require('./model')
 const { omit } = require('./utils')
 const builtinPlugins = require('./plugins')
+const { KexError } = require('./errors')
+
+/** @typedef { import('knex/lib/query/builder') } Knex */
+/** @typedef { import('./query-builder').Scope } Scope */
+/** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
+/** @typedef { import('./model').Model } Model */
+/** @typedef { import('./relations/relation') } Relation */
+
+/**
+ * @type {Object} ModelDefaultOptions
+ * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Object.<String, Object>} [relations]
+ * @property {PluginFactory[]} [plugins]
+ * @property {Object.<String,Scope>} [scopes]
+ * @property {Object.<String,Scope>} [globalScopes]
+ */
+
+/**
+ * @typedef {Object} ModelOptions
+ * @property {String} [tableName]
+ * @property {String} [primaryKey=id]
+ * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Object.<String, Object>} [relations]
+ * @property {PluginFactory[]} [plugins]
+ * @property {Object.<String,Scope>} [scopes]
+ * @property {Object.<String,Scope>} [globalScopes]
+ * @property {Object.<String,Relation>} [relations]
+ */
+
+/**
+ * @typedef {Object} KexOptions
+ * @property {ModelDefaultOptions} [modelDefaults]
+ */
 
 class Kex {
+  /**
+   * @param {Knex} knex
+   * @param {KexOptions} options
+   */
   constructor (knex, options) {
     this.models = {}
     this.knex = knex
@@ -11,6 +48,7 @@ class Kex {
 
   /**
    * @param {Object}
+   * @private
    */
   setOptions (options) {
     const {
@@ -20,7 +58,7 @@ class Kex {
 
     this.options = {
       ...otherOptions,
-      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey'])
+      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey', 'relations'])
     }
   }
 
@@ -28,10 +66,15 @@ class Kex {
    * Create new model
    *
    * @param {String} name
-   * @param {Object} options
-   * @return {Object}
+   * @param {ModelOptions} options
+   * @return {Model}
+   * @throws {KexError}
    */
   createModel (name, options = {}) {
+    if (name in this.models) {
+      throw new KexError(`Model ${name} is defined`)
+    }
+
     const {
       plugins = [],
       modelDefaults
@@ -46,10 +89,23 @@ class Kex {
       ...builtinPlugins,
       ...plugins
     ]
-    const Model = modelUtils.createModel(this.knex, name, useOptions)
+    const Model = modelUtils.createModel(this, name, useOptions)
     this.models[name] = modelUtils.applyPlugins(modelPlugins, Model, useOptions)
 
     return this.models[name]
+  }
+
+  /**
+   * @param {String} name
+   * @return {Model}
+   * @throws {KexError}
+   */
+  getModel (name) {
+    if (name in this.models) {
+      return this.models[name]
+    }
+
+    throw new KexError(`Model ${name} is not defined`)
   }
 }
 
