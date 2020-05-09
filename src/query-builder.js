@@ -10,13 +10,6 @@ const { toScope } = require('./utils')
  * @param {...*} args
  */
 
-/**
- * @typedef {Object} ExtendOptions
- * @property {String} methodName
- * @property {Function} fn
- * @property {Boolean} [force=false]
- */
-
 class QueryBuilder extends BaseQueryBuilder {
   /**
    * Create instance of QueryBuilder
@@ -56,7 +49,10 @@ class QueryBuilder extends BaseQueryBuilder {
   }
 
   /**
-   * @param {ExtendOptions} options
+   * @param {Object} options
+   * @param {String} options.methodName
+   * @param {Function} options.fn
+   * @param {Boolean} [options.force=false]
    */
   static extend (options) {
     const { methodName, fn, force = false } = options

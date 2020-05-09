@@ -35,8 +35,8 @@ const getPathInfo = (path) => {
 }
 
 /**
- * @param {Object.<String, Scope>} includesList
- * @return {Object.<String, IncludeScope>}
+ * @param {Object<String, Scope>} includesList
+ * @return {Object<String, IncludeScope>}
  */
 const groupIncludes = (includesList) => {
   /** @type Map<String, IncludeScope> */

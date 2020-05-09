@@ -14,8 +14,8 @@ class Related {
 
   /**
    * @param {Object|Object[]} rows
-   * @param {Object.<String,Scope>} includes
-   * @return {Promise.<Object|Object[]>}
+   * @param {Object<String, Scope>} includes
+   * @return {Promise<Object|Object[]>}
    */
   async fetchRelated (rows, includes) {
     const entries = Object.entries(groupIncludes(includes || {}))
@@ -53,7 +53,7 @@ class Related {
    * @param {Object[]} rows
    * @param {String} name
    * @param {Scope} scope
-   * @return {Promise.<Object[]>}
+   * @return {Promise<Object[]>}
    * @private
    */
   async fetchSingleRelation (rows, name, scope) {

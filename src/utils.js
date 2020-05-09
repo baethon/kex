@@ -39,7 +39,7 @@ const mapTo = (keys, keyFn) => (rows) => {
  *
  * @param {String[]} keys
  * @param {Function} keyFn the function used to get the key from result row
- * @return {Array.<Object[]>}
+ * @return {Array<Object[]>}
  */
 const mapToMany = (keys, keyFn) => (rows) => {
   const group = new Map(keys.map(key => ([key, []])))

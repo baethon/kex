@@ -19,20 +19,11 @@ const { KexError } = require('./errors')
  * @property {String} [tableName]
  * @property {String} [primaryKey=id]
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
- * @property {Object.<String, Object>} [relations]
- * @property {Object.<String,Scope>} [scopes]
- * @property {Object.<String,Scope>} [globalScopes]
- * @property {Object.<String,Relation>} [relations]
+ * @property {Object<String, Object>} [relations]
+ * @property {Object<String, Scope>} [scopes]
+ * @property {Object<String, Scope>} [globalScopes]
+ * @property {Object<String, Relation>} [relations]
  * @property {Boolean|TimestampsOptions} [timestamps=false]
- */
-
-/**
- * @typedef {Object} ExtendOptions
- * @property {String} methodName
- * @property {Function} fn
- * @property {Boolean} [force=false]
- * @property {Boolean} [queryProxy=false] should the function
- *                                        be proxied to the QueryBuilder?
  */
 
 const proxyQueryMethods = [
@@ -71,7 +62,12 @@ class Model {
   }
 
   /**
-   * @param {ExtendOptions} options
+   * @param {Object} options
+   * @param {String} options.methodName
+   * @param {Function} options.fn
+   * @param {Boolean} [options.force=false]
+   * @param {Boolean} [options.queryProxy=false] should the function
+   *                                             be proxied to the QueryBuilder?
    */
   extend (options) {
     const { methodName, fn, queryProxy = false } = options

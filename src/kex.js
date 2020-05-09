@@ -16,18 +16,10 @@ const { KexError } = require('./errors')
 /**
  * @type {Object} ModelDefaultOptions
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
- * @property {Object.<String, Object>} [relations]
- * @property {Object.<String,Scope>} [scopes]
- * @property {Object.<String,Scope>} [globalScopes]
+ * @property {Object<String, Object>} [relations]
+ * @property {Object<String, Scope>} [scopes]
+ * @property {Object<String, Scope>} [globalScopes]
  * @property {Boolean|TimestampsOptions} [timestamps=false]
- */
-
-/**
- * @typedef {Object} KexOptions
- * @property {Knex} [knex] the knex instance; required when `knexClientResolver` is missing
- * @property {ModelDefaultOptions} [modelDefaults]
- * @property {KnexClientResolver} [knexClientResolver]
- * @property {PluginFactory[]} [plugins]
  */
 
 /**
@@ -37,7 +29,11 @@ const { KexError } = require('./errors')
 
 class Kex {
   /**
-   * @param {KexOptions} options
+   * @param {Object} options
+   * @param {Knex} [options.knex] the knex instance; required when `knexClientResolver` is missing
+   * @param {ModelDefaultOptions} [options.modelDefaults]
+   * @param {KnexClientResolver} [options.knexClientResolver]
+   * @param {PluginFactory[]} [options.plugins]
    */
   constructor (options) {
     this.models = {}
