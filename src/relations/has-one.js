@@ -11,11 +11,15 @@ const Relation = require('./relation')
 class HasOne extends Relation {
   /**
    * @param {String} related
-   * @param {String} foreignKey
-   * @param {String} localKey
+   * @param {Object} [options]
+   * @param {String} [options.foreignKey]
+   * @param {String} [options.localKey]
    */
-  constructor (related, foreignKey, localKey) {
+  constructor (related, options = {}) {
     super()
+
+    const { foreignKey, localKey } = options
+
     this.related = related
     this.foreignKey = foreignKey
     this.localKey = localKey

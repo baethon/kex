@@ -5,18 +5,6 @@ const { mapToMany, prop, noop, omit } = require('../utils')
 
 /** @typedef {import('../model')} Model */
 
-/**
- * @typedef {Object} Options
- * @property {String} [table]
- * @property {String} [foreignPivotKey] the key used in the pivot table,
- *                                      referencing the parent model
- * @property {String} [relatedPivotKey] the key used in the pivot table,
- *                                      referencing the related model
- * @property {String} [parentKey]       the parent model key used
- *                                      to retrieve the related models
- * @property {String} [relatedKey]      the related model key
- */
-
 const omitPivotFields = groupedRows => groupedRows.map(
   rows => rows.map(
     item => omit(item, ['pivot__foreign_id'])
@@ -26,7 +14,15 @@ const omitPivotFields = groupedRows => groupedRows.map(
 class BelongsToMany extends Relation {
   /**
    * @param {String} related
-   * @param {Options} [options]
+   * @param {Object} [options]
+   * @param {String} [options.table]
+   * @param {String} [options.foreignPivotKey] the key used in the pivot table,
+   *                                           referencing the parent model
+   * @param {String} [options.relatedPivotKey] the key used in the pivot table,
+   *                                           referencing the related model
+   * @param {String} [options.parentKey]       the parent model key used
+   *                                           to retrieve the related models
+   * @param {String} [options.relatedKey]      the related model key
    */
   constructor (related, options = {}) {
     super()

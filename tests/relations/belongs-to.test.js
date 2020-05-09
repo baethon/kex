@@ -15,7 +15,7 @@ const macro = async (t, options) => {
 
   const { testMessage, User, Message } = t.context
 
-  const relation = new BelongsTo('User', foreignKey, otherKey)
+  const relation = new BelongsTo('User', { foreignKey, otherKey })
   const dataLoader = relation.createDataLoader(Message, scope)
   const expected = await expectedFn(User)
   const actual = await dataLoader(testMessage)

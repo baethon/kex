@@ -14,7 +14,7 @@ test.serial.before(async t => {
     relations: {
       tags: new BelongsToMany('Tag'),
       messages: new HasMany('Message'),
-      receivedMessages: new HasMany('Message', 'to_user')
+      receivedMessages: new HasMany('Message', { foreignKey: 'to_user' })
     }
   })
 

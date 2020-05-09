@@ -1,4 +1,5 @@
 const DataLoader = require('dataloader')
+
 const { mapTo, prop, noop } = require('../utils')
 const Relation = require('./relation')
 
@@ -11,11 +12,15 @@ const Relation = require('./relation')
 class BelongsTo extends Relation {
   /**
    * @param {String} related
-   * @param {String} foreignKey
-   * @param {String} otherKey
+   * @param {Object} [options]
+   * @param {String} [options.foreignKey]
+   * @param {String} [options.otherKey]
    */
-  constructor (related, foreignKey, otherKey) {
+  constructor (related, options = {}) {
     super()
+
+    const { foreignKey, otherKey } = options
+
     this.related = related
     this.foreignKey = foreignKey
     this.otherKey = otherKey
