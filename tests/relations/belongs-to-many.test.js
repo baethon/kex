@@ -10,6 +10,7 @@ setupDb()
 const buildTagsJoinQuery = (Tag, table, pivotKey = 'tag_id', primaryKey = 'id') => Tag.query()
   .join(`${table} AS pivot`, `pivot.${pivotKey}`, `tags.${primaryKey}`)
   .select('tags.*')
+  .orderBy('tags.id')
 
 test.serial.before(async t => {
   const kex = createKex(t)
