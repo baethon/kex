@@ -43,5 +43,8 @@
     "files": [
       "tests/**/*.test.js"
     ]
-  }
+  },
+  "files": [
+    "src/**/*.js"
+  ]
 }
