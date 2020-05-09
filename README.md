@@ -4,7 +4,7 @@ Kex is a query extension for [Knex](https://knexjs.org/). It uses the concept of
 
 ## Installation
 
-Intall the package:
+Install the package:
 
 ```
 npm i @baethon/kex
@@ -75,7 +75,7 @@ User.where({ active: true })
 
 ## Scopes
 
-Scope is a function that alters the query. They can be chained in a same way as other query methods.
+[Scope](https://github.com/baethon/kex/wiki/Scopes) is a function that alters the query. They can be chained in a same way as other query methods.
 
 Scopes are declared when creating a model:
 
@@ -102,7 +102,7 @@ const usersList = await User.where(qb => {
 
 ## Global scopes
 
-Global scope is very similar to regular scope. The main difference is that it's applied automatically to every query.
+[Global scope](https://github.com/baethon/kex/wiki/Scopes#global-scopes) is very similar to regular scope. The main difference is that it's applied automatically to every query.
 
 ```js 
 const User = kex.createModel('User', {
@@ -129,13 +129,13 @@ const usersList = await User.query()
 
 Kex supports many other things:
 
-- plugins
-- soft-deletes
-- timestamps
-- relations 
-- query utilities
+- [plugins](https://github.com/baethon/kex/wiki/Plugins)
+- [soft-deletes](https://github.com/baethon/kex/wiki/Soft-deletes)
+- [timestamps](https://github.com/baethon/kex/wiki/Timestamps)
+- [relations](https://github.com/baethon/kex/wiki/Relations)
+- [query utilities](https://github.com/baethon/kex/wiki/Query-utilities)
 
-## Convetions
+## Conventions
 
 Kex uses naming conventions taken from Lucid, or Eloquent:
 
