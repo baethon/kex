@@ -146,6 +146,12 @@ Kex uses naming conventions taken from Lucid, or Eloquent:
 
 The naming can be altered using the configuration objects passed to the model.
 
+## But... why?
+
+That's a great question! I've worked with a few Node ORMs. All of them have some problems. With my recent project, I used one of them. Quickly it became a problem. I decided to switch to a different one. Even worse. Then, a good mentor suggested that maybe I should use raw queries? Nah! Wait, Knex is very close to "raw". It has a nice migrations manager and a powerful query builder. It was a good choice.
+
+With this experience in mind I started to wonder - do I need an ORM? Do I _want_ an ORM? No! However, what I miss in Knex are the things which I love in Lucid, or Eloquent - scopes, relations, extensions, and some conventions. Kex tries to bring those concepts to Knex, but limit them only to queries. There won't be any active-record models and no hydration. Just queries and ways to manipulate them.
+
 ## Testing
 
 The test suite is a combination of unit tests and integration tests. The latter use by default a SQLite database, however you can (and sometimes must) choose a different database backend.
