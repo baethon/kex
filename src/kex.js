@@ -16,7 +16,6 @@ const { KexError } = require('./errors')
 /**
  * @type {Object} ModelDefaultOptions
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
- * @property {Object<String, Object>} [relations]
  * @property {Object<String, Scope>} [scopes]
  * @property {Object<String, Scope>} [globalScopes]
  * @property {Boolean|TimestampsOptions} [timestamps=false]
