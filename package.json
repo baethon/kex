@@ -1,7 +1,12 @@
 {
   "name": "@baethon/kex",
-  "version": "1.0.0",
-  "description": "Knex extended query objects",
+  "version": "1.0.0-rc.0",
+  "description": "Extend knex with query models",
+  "keywords": [
+    "knex",
+    "model",
+    "query"
+  ],
   "main": "index.js",
   "author": "Radoslaw Mejer <radmen@baethon.com>",
   "license": "MIT",
