@@ -19,12 +19,12 @@ const { KexError } = require('./errors')
  * @property {Object.<String, Object>} [relations]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
- * @property {KnexClientResolver} [knexClientResolver]
  * @property {Boolean|TimestampsOptions} [timestamps=false]
  */
 
 /**
  * @typedef {Object} KexOptions
+ * @property {Knex} [knex] the knex instance; required when `knexClientResolver` is missing
  * @property {ModelDefaultOptions} [modelDefaults]
  * @property {KnexClientResolver} [knexClientResolver]
  * @property {PluginFactory[]} [plugins]
@@ -37,29 +37,34 @@ const { KexError } = require('./errors')
 
 class Kex {
   /**
-   * @param {Knex} knex
    * @param {KexOptions} options
    */
-  constructor (knex, options) {
+  constructor (options) {
     this.models = {}
-    this.knex = knex
     this.setOptions(options)
   }
 
   /**
-   * @param {KexOptions}
+   * @param {KexOptions} options
    * @private
    */
   setOptions (options) {
     const {
       modelDefaults = {},
+      knex,
+      knexClientResolver,
       ...otherOptions
     } = options
+
+    if (!knex && !knexClientResolver) {
+      throw new KexError('Missing knex instance or knexClientResolver')
+    }
 
     /** @type {KexOptions} */
     this.options = {
       ...otherOptions,
-      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey', 'relations'])
+      modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey', 'relations']),
+      knexClientResolver: knexClientResolver || (() => knex.client)
     }
   }
 
@@ -115,10 +120,7 @@ class Kex {
    */
   getKnexClient () {
     const { knexClientResolver } = this.options
-
-    return knexClientResolver
-      ? knexClientResolver()
-      : this.knex.client
+    return knexClientResolver()
   }
 }
 

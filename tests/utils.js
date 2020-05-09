@@ -1,8 +1,12 @@
 const test = require('ava')
 const { Kex } = require('../')
 
-const createKex = ({ context }, options = {}) => {
-  return new Kex(context.knex, options)
+const createKex = (t, options = {}) => {
+  const { knex } = t.context
+  return new Kex({
+    ...options,
+    knex
+  })
 }
 
 const onlyForClient = (dbClient, name, testFn) => {
