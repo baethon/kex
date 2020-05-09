@@ -64,19 +64,17 @@ test('extend() | add query proxy', t => {
   t.is(result, Foo.query().test())
 })
 
-test.serial('use custom query resolver', t => {
+test.serial('retrieve knex client from kex instance', t => {
   const { kex } = t.context
-  const client = Symbol('fake knex client')
+  const Foo = new Model(kex, 'Foo')
+  const client = Symbol('fake client')
 
-  const Foo = new Model(kex, 'Foo', {
-    knexClientResolver () {
-      return client
-    }
-  })
-
+  const stub = sinon.stub(kex, 'getKnexClient').returns(client)
   const spy = sinon.spy(Foo.QueryBuilder, 'create')
+
   Foo.query()
-  spy.restore()
+
+  stub.restore()
 
   t.true(spy.calledWith(client))
 })

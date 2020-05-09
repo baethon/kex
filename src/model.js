@@ -7,12 +7,6 @@ const { KexError } = require('./errors')
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
 /** @typedef { import('./relations/relation') } Relation */
 /** @typedef { import('./query-builder').Scope } Scope */
-/** @typedef { import('knex/lib/client') } KnexClient */
-
-/**
- * @callback KnexClientResolver
- * @return {KnexClient}
- */
 
 /**
  * @typedef {Object} TimestampsOptions
@@ -30,7 +24,6 @@ const { KexError } = require('./errors')
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
  * @property {Object.<String,Relation>} [relations]
- * @property {KnexClientResolver} [knexClientResolver]
  * @property {Boolean|TimestampsOptions} [timestamps=false]
  */
 
@@ -75,7 +68,7 @@ class Model {
 
   query () {
     this.bootIfNotBooted()
-    return this.QueryBuilder.create(this.getKnexClient())
+    return this.QueryBuilder.create(this.kex.getKnexClient())
   }
 
   /**
@@ -131,19 +124,6 @@ class Model {
       .forEach(([name, fn]) => this.QueryBuilder.addGlobalScope(name, fn))
 
     this.booted = true
-  }
-
-  /**
-   * @return {KnexClient}
-   * @private
-   */
-  getKnexClient () {
-    const { knexClientResolver } = this.options
-    const { knex } = this.kex
-
-    return !knexClientResolver
-      ? knex.client
-      : knexClientResolver()
   }
 }
 

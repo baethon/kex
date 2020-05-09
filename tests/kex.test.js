@@ -55,3 +55,19 @@ test('merge default options with model options | ignore selected options', t => 
 
   t.deepEqual(User.options, {})
 })
+
+test('resolve knex client', t => {
+  const { knex } = t.context
+  const kex = createKex(t)
+
+  t.is(knex.client, kex.getKnexClient())
+})
+
+test('resolve knex client | custom resolver', t => {
+  const client = Symbol('fake client')
+  const kex = createKex(t, {
+    knexClientResolver: () => client
+  })
+
+  t.is(client, kex.getKnexClient())
+})

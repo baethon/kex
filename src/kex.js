@@ -4,6 +4,7 @@ const pluginUtils = require('./plugins')
 const { KexError } = require('./errors')
 
 /** @typedef { import('knex/lib/query/builder') } Knex */
+/** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./query-builder').Scope } Scope */
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
 /** @typedef { import('./model') } Model */
@@ -25,6 +26,12 @@ const { KexError } = require('./errors')
 /**
  * @typedef {Object} KexOptions
  * @property {ModelDefaultOptions} [modelDefaults]
+ * @property {KnexClientResolver} [knexClientResolver]
+ */
+
+/**
+ * @callback KnexClientResolver
+ * @return {KnexClient}
  */
 
 class Kex {
@@ -39,7 +46,7 @@ class Kex {
   }
 
   /**
-   * @param {Object}
+   * @param {KexOptions}
    * @private
    */
   setOptions (options) {
@@ -48,6 +55,7 @@ class Kex {
       ...otherOptions
     } = options
 
+    /** @type {KexOptions} */
     this.options = {
       ...otherOptions,
       modelDefaults: omit(modelDefaults, ['tableName', 'primaryKey', 'relations'])
@@ -99,6 +107,17 @@ class Kex {
     }
 
     throw new KexError(`Model ${name} is not defined`)
+  }
+
+  /**
+   * @return {KnexClient}
+   */
+  getKnexClient () {
+    const { knexClientResolver } = this.options
+
+    return knexClientResolver
+      ? knexClientResolver()
+      : this.knex.client
   }
 }
 
