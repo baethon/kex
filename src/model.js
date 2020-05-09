@@ -20,7 +20,6 @@ const { KexError } = require('./errors')
  * @property {String} [primaryKey=id]
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
  * @property {Object.<String, Object>} [relations]
- * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
  * @property {Object.<String,Relation>} [relations]

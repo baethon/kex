@@ -6,6 +6,8 @@ const builtinPlugins = [
   require('./timestamps')
 ]
 
+/** @typedef { import('../model) } Model */
+
 /**
  * @callback PluginFactory
  * @param {Model} Model

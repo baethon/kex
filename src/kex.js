@@ -11,12 +11,12 @@ const { KexError } = require('./errors')
 /** @typedef { import('./model').ModelOptions } ModelOptions */
 /** @typedef { import('./model').KnexClientResolver } KnexClientResolver */
 /** @typedef { import('./model').TimestampsOptions } TimestampsOptions */
+/** @typedef { import('./plugins').PluginFactory } PluginFactory */
 
 /**
  * @type {Object} ModelDefaultOptions
  * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
  * @property {Object.<String, Object>} [relations]
- * @property {PluginFactory[]} [plugins]
  * @property {Object.<String,Scope>} [scopes]
  * @property {Object.<String,Scope>} [globalScopes]
  * @property {KnexClientResolver} [knexClientResolver]
@@ -27,6 +27,7 @@ const { KexError } = require('./errors')
  * @typedef {Object} KexOptions
  * @property {ModelDefaultOptions} [modelDefaults]
  * @property {KnexClientResolver} [knexClientResolver]
+ * @property {PluginFactory[]} [plugins]
  */
 
 /**
