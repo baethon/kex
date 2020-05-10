@@ -10,6 +10,7 @@ module.exports = (Model) => {
     methodName: 'find',
     fn (id) {
       return this.query()
+        .withoutGlobalScopes()
         .where(primaryKey, id)
         .first()
     }
