@@ -19,3 +19,11 @@ test('allows to pass custom table name', t => {
 
   equalQueries(t, knex('foos'), User.query())
 })
+
+test('passing subqueries', t => {
+  const { knex } = t.context
+  const User = createKex(t).createModel('User')
+  const subquery = knex.table('tags').select('user_id')
+
+  equalQueries(t, knex('users').whereIn('id', subquery), User.query().whereIn('id', subquery))
+})

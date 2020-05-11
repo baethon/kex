@@ -18,24 +18,13 @@ class QueryBuilder extends BaseQueryBuilder {
    * @return {QueryBuilder}
    */
   static create (client) {
-    const Builder = this
-
-    // Knex client is used as a factory for creating various objects.
-    // We need to make a shallow copy of the client which will
-    // return the custom QueryBuilder instance.
-    const localClient = Object.assign(
-      Object.create(Object.getPrototypeOf(client)),
-      client,
-      {
-        queryBuilder () {
-          return new Builder(this)
-        }
-      }
-    )
-
-    const qb = new this(localClient)
-
+    const qb = new this(client)
     return qb.table(this.tableName)
+  }
+
+  newInstance () {
+    const Builder = this.constructor
+    return new Builder(this.client)
   }
 
   /**
@@ -111,6 +100,22 @@ class QueryBuilder extends BaseQueryBuilder {
 
     list.forEach(name => this.withoutGlobalScope(name))
     return this
+  }
+
+  /**
+   * @inheritdoc
+   */
+  whereWrapped (callback) {
+    return BaseQueryBuilder.prototype.whereWrapped.call(this, (qb) => {
+      const builder = this.newInstance()
+      callback.call(builder, builder)
+
+      // now the magic - builder and qb are different instances
+      // knex will use `qb` to build the query
+      // since we passed `builder` to the callback we need to merge
+      // it with the `qb`
+      Object.assign(qb, builder)
+    })
   }
 }
 
