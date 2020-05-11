@@ -7,8 +7,10 @@ Kex is a query extension for [Knex](https://knexjs.org/). It uses the concept of
 Install the package:
 
 ```
-npm i @baethon/kex
+npm i @baethon/kex@next
 ```
+
+_(the package is still in RC version)_
 
 Set up Kex instance:
 
