@@ -19,7 +19,12 @@ class QueryBuilder extends BaseQueryBuilder {
    */
   static create (client) {
     const qb = new this(client)
-    return qb.table(this.tableName)
+
+    return BaseQueryBuilder.prototype.table.call(qb, this.tableName)
+  }
+
+  table () {
+    throw new KexError('Can\'t use table() in models query builder')
   }
 
   newInstance () {

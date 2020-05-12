@@ -27,3 +27,12 @@ test('passing subqueries', t => {
 
   equalQueries(t, knex('users').whereIn('id', subquery), User.query().whereIn('id', subquery))
 })
+
+test('forbid using table()', t => {
+  const User = createKex(t).createModel('User')
+
+  t.throws(() => {
+    User.query()
+      .table('foo')
+  })
+})
