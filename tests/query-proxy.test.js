@@ -5,17 +5,6 @@ const { equalQueries } = require('./assertions')
 
 setupDb()
 
-test('proxy scope methods', t => {
-  const kex = createKex(t)
-  const User = kex.createModel('User', {
-    scopes: {
-      test: qb => qb.where('active', true)
-    }
-  })
-
-  equalQueries(t, User.query().test(), User.test())
-})
-
 const proxyMacro = (t, options) => {
   const { expectedFn, actualFn } = options
   const User = createKex(t).createModel('User')

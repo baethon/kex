@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `table()` in QueryBuilder will throw an exception
+- model scopes are no longer proxies to the query builder **(breaking change)**
+
+### Removed
+
+- `queryProxy` option of `Model.extend()` **(breaking change)**
 
 ## [1.0.0-rc.1] - 2020-05-11
 

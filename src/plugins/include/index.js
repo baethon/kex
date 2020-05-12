@@ -8,9 +8,8 @@ module.exports = (Model) => {
   const { QueryBuilder } = Model
   const related = new Related(Model)
 
-  Model.extend({
+  Model.QueryBuilder.extend({
     methodName: 'include',
-    queryProxy: true,
     fn (...args) {
       this.includes = {
         ...this.includes,

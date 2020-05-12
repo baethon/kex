@@ -1,7 +1,6 @@
 const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const QueryBuilder = require('./query-builder')
-const { toScope } = require('./utils')
 const { KexError } = require('./errors')
 
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
@@ -66,37 +65,17 @@ class Model {
    * @param {String} options.methodName
    * @param {Function} options.fn
    * @param {Boolean} [options.force=false]
-   * @param {Boolean} [options.queryProxy=false] should the function
-   *                                             be proxied to the QueryBuilder?
    */
   extend (options) {
-    const { methodName, fn, queryProxy = false } = options
+    const { methodName, fn } = options
 
     if (this[methodName]) {
       throw new KexError(`Can't overwrite method [${methodName}] in ${this.name} model`)
     }
 
-    if (queryProxy) {
-      this.QueryBuilder.extend({ methodName, fn })
-      this[methodName] = (...args) => {
-        const query = this.query()
-        return query[methodName](...args)
-      }
-    } else {
-      this[methodName] = (...args) => {
-        return fn.call(this, ...args)
-      }
+    this[methodName] = (...args) => {
+      return fn.call(this, ...args)
     }
-  }
-
-  addScope (name, fn) {
-    this.extend({
-      methodName: name,
-      fn: toScope(fn),
-      queryProxy: true
-    })
-
-    return this
   }
 
   /**
@@ -113,7 +92,7 @@ class Model {
     } = this.options
 
     Object.entries(scopes)
-      .forEach(([name, fn]) => this.addScope(name, fn))
+      .forEach(([name, fn]) => this.QueryBuilder.addScope(name, fn))
 
     Object.entries(globalScopes)
       .forEach(([name, fn]) => this.QueryBuilder.addGlobalScope(name, fn))

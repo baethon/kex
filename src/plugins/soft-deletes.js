@@ -23,11 +23,11 @@ module.exports = (Model) => {
     qb.whereNull(columnName)
   })
 
-  Model.addScope('withTrashed', qb => {
+  Model.QueryBuilder.addScope('withTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
   })
 
-  Model.addScope('onlyTrashed', qb => {
+  Model.QueryBuilder.addScope('onlyTrashed', qb => {
     qb.withoutGlobalScope('soft-deletes')
     qb.whereNotNull(columnName)
   })

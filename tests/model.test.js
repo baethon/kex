@@ -42,28 +42,6 @@ test('build model instance | custom primary key', t => {
   t.is('my_foo', Foo.primaryKey)
 })
 
-test('extend() | add query proxy', t => {
-  const { kex } = t.context
-  const Foo = new Model(kex, 'Foo')
-
-  const result = Symbol('query result')
-  const macro = function () {
-    t.true(this instanceof Foo.QueryBuilder)
-    return result
-  }
-
-  Foo.extend({
-    methodName: 'test',
-    fn: macro,
-    queryProxy: true
-  })
-
-  t.plan(4)
-
-  t.is(result, Foo.test())
-  t.is(result, Foo.query().test())
-})
-
 test.serial('retrieve knex client from kex instance', t => {
   const { kex } = t.context
   const Foo = new Model(kex, 'Foo')

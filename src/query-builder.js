@@ -1,6 +1,5 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
-const { toScope } = require('./utils')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 
@@ -9,6 +8,11 @@ const { toScope } = require('./utils')
  * @param {QueryBuilder} qb
  * @param {...*} args
  */
+
+const toScope = (fn) => function (...args) {
+  fn(this, ...args)
+  return this
+}
 
 class QueryBuilder extends BaseQueryBuilder {
   /**
@@ -40,6 +44,17 @@ class QueryBuilder extends BaseQueryBuilder {
    */
   static addGlobalScope (name, fn) {
     this.globalScopes[name] = toScope(fn)
+  }
+
+  /**
+   * @param {String} name
+   * @param {Scope} fn
+   */
+  static addScope (name, fn) {
+    this.extend({
+      methodName: name,
+      fn: toScope(fn)
+    })
   }
 
   /**
