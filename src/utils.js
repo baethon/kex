@@ -1,3 +1,5 @@
+const { KexError } = require('./errors')
+
 /**
  * @param {Object} object
  * @param {String[]} props
@@ -57,11 +59,16 @@ const mapToMany = (keys, keyFn) => (rows) => {
  */
 const isObject = value => Object.prototype.toString.call(value) === '[object Object]'
 
+const requiredArgument = (name) => {
+  throw new KexError(`Argument [${name}] is required`)
+}
+
 module.exports = {
   omit,
   mapTo,
   mapToMany,
   isObject,
   prop: name => item => item[name],
-  noop: () => {}
+  noop: () => {},
+  requiredArgument,
 }

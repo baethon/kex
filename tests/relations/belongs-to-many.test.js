@@ -119,3 +119,43 @@ test.serial('fetch tags users', fetchTagsUsersMacro, {})
 test.serial('fetch tags users | custom table', fetchTagsUsersMacro, {
   table: 'user_tag'
 })
+
+const queryForSingleMacro = async (t, options) => {
+  const { Tag, User } = t.context
+  const { expectedFn, ...relationOptions } = options
+  const relation = new BelongsToMany('Tag', relationOptions)
+
+  const parentKey = relationOptions.parentKey || User.primaryKey
+  const jon = await User.query()
+    .where('username', 'jon')
+    .firstOrFail()
+
+  const query = relation.queryForSingle(User, jon[parentKey])
+  const actual = await query
+  const expected = await expectedFn(Tag, jon)
+
+  t.true(query instanceof Tag.QueryBuilder)
+  compareDbResults(t, expected, actual)
+}
+
+test('query for single | default options', queryForSingleMacro, {
+  expectedFn: (Tag, jon) => buildTagsJoinQuery(Tag, 'user_tag')
+    .where('pivot.user_id', jon.id)
+})
+
+test('query for single | custom table name', queryForSingleMacro, {
+  expectedFn: (Tag, jon) => buildTagsJoinQuery(Tag, 'user_tag')
+    .where('pivot.user_id', jon.id),
+  table: 'user_tag'
+})
+
+test('query for single | custom keys', queryForSingleMacro, {
+  expectedFn: (Tag, jon) =>
+    buildTagsJoinQuery(Tag, 'tag_user_using_strings', 'tag', 'title')
+      .where('pivot.username', jon.username),
+  table: 'tag_user_using_strings',
+  foreignPivotKey: 'username',
+  relatedPivotKey: 'tag',
+  parentKey: 'username',
+  relatedKey: 'title'
+})
