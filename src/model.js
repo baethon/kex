@@ -22,6 +22,7 @@ const { KexError } = require('./errors')
 
 const proxyQueryMethods = [
   'where',
+  'whereIn',
   'insert',
   'returning'
 ]

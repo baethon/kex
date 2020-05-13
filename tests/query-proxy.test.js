@@ -26,3 +26,8 @@ test('returning()', proxyMacro, {
   expectedFn: User => User.query().returning('id').insert({ active: true }),
   actualFn: User => User.returning('id').insert({ active: true })
 })
+
+test('wherIn', proxyMacro, {
+  expectedFn: User => User.query().whereIn('id', [1]),
+  actualFn: User => User.whereIn('id', [1])
+})

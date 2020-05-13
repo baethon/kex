@@ -45,7 +45,7 @@ const activeUsers = await User.query()
 In some cases, you can omit the `query()` method and start chaining using following methods:
 
 - `where()`
-- all scope methods
+- `whereIn()`
 - `insert()`
 - `returning()`
 
