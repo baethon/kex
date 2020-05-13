@@ -5,6 +5,11 @@ const { isObject } = require('../utils')
  * @property {String} [columnName=deleted_at]
  */
 
+/** @type {SoftDeleteOptions} */
+const defaults = {
+  columnName: 'deleted_at'
+}
+
 /**
  * @param {import('../model')} Model
  */
@@ -15,9 +20,10 @@ module.exports = (Model) => {
     return
   }
 
-  const { columnName = 'deleted_at' } = isObject(softDeletes)
-    ? softDeletes
-    : {}
+  const { columnName = 'deleted_at' } = {
+    ...defaults,
+    ...softDeletes
+  }
 
   Model.QueryBuilder.addGlobalScope('soft-deletes', qb => {
     qb.whereNull(columnName)

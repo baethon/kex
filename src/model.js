@@ -6,18 +6,13 @@ const { KexError } = require('./errors')
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
 /** @typedef { import('./relations/relation') } Relation */
 /** @typedef { import('./query-builder').Scope } Scope */
-
-/**
- * @typedef {Object} TimestampsOptions
- * @property {String} [deletedAtColumn=deleted_at]
- * @property {String} [updatedAtColumn=updated_at]
- */
+/** @typedef { import('./plugins/timestamps').TimestampsOptions } TimestampsOptions */
 
 /**
  * @typedef {Object} ModelOptions
  * @property {String} [tableName]
  * @property {String} [primaryKey=id]
- * @property {Boolean | SoftDeleteOptions} [softDeletes=false]
+ * @property {Boolean|SoftDeleteOptions} [softDeletes=false]
  * @property {Object<String, Object>} [relations]
  * @property {Object<String, Scope>} [scopes]
  * @property {Object<String, Scope>} [globalScopes]

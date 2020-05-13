@@ -1,10 +1,21 @@
 const flow = require('lodash.flow')
-const { isObject } = require('../utils')
 
 const setDateField = (name) => item => ({
   ...item,
   [name]: new Date()
 })
+
+/**
+ * @typedef {Object} TimestampsOptions
+ * @property {String} [deletedAtColumn=deleted_at]
+ * @property {String} [updatedAtColumn=updated_at]
+ */
+
+/** @type {TimestampsOptions} */
+const defaults = {
+  deletedAtColumn: 'deleted_at',
+  updatedAtColumn: 'updated_at'
+}
 
 /**
  * @param {import('../model')} Model
@@ -17,9 +28,10 @@ module.exports = (Model) => {
   }
 
   const { QueryBuilder } = Model
-  const timestampsOptions = isObject(timestamps)
-    ? timestamps
-    : {}
+  const timestampsOptions = {
+    ...defaults,
+    ...timestamps
+  }
 
   const {
     createdAtColumn = 'created_at',
