@@ -12,6 +12,14 @@ class Event {
   cancel () {
     this.cancelled = true
   }
+
+  /**
+   * @param {*} results
+   * @return {Event}
+   */
+  toAfterEvent (results) {
+    throw new KexError('toAfterEvent() should be implemented in the child class')
+  }
 }
 
 module.exports = Event
