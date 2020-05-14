@@ -2,6 +2,7 @@ const pluralize = require('pluralize')
 const snakeCase = require('lodash.snakecase')
 const QueryBuilder = require('./query-builder')
 const { KexError } = require('./errors')
+const { EventsPipeline } = require('./events')
 
 /** @typedef { import('./plugins/soft-deletes').SoftDeleteOptions } SoftDeleteOptions */
 /** @typedef { import('./relations/relation') } Relation */
@@ -39,6 +40,7 @@ class Model {
     this.options = options
     this.QueryBuilder = QueryBuilder.createChildClass(this)
     this.booted = false
+    this.events = new EventsPipeline()
   }
 
   get tableName () {
@@ -53,6 +55,7 @@ class Model {
 
   query () {
     this.bootIfNotBooted()
+
     return this.QueryBuilder.create(this.kex.getKnexClient())
   }
 

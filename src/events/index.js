@@ -1,5 +1,5 @@
 module.exports = {
-  Pipeline: require('./pipeline'),
+  EventsPipeline: require('./pipeline'),
   DeletingEvent: require('./deleting'),
   DeletedEvent: require('./deleted'),
   FetchingEvent: require('./fetching'),

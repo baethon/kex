@@ -3,6 +3,7 @@ const { KexError } = require('./errors')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
+/** @typedef { import('./events/pipeline') } EventsPipeline */
 
 /**
  * @callback Scope
@@ -26,15 +27,6 @@ class QueryBuilder extends BaseQueryBuilder {
     const qb = new this(client)
 
     return BaseQueryBuilder.prototype.table.call(qb, this.tableName)
-  }
-
-  table () {
-    throw new KexError('Can\'t use table() in models query builder')
-  }
-
-  newInstance () {
-    const Builder = this.constructor
-    return new Builder(this.client)
   }
 
   /**
@@ -75,6 +67,14 @@ class QueryBuilder extends BaseQueryBuilder {
   }
 
   /**
+   * @return {Model}
+   * @abstract
+   */
+  static get Model () {
+    throw new KexError('The Model getter is not implemented')
+  }
+
+  /**
    * @inheritdoc
    */
   constructor (client) {
@@ -82,6 +82,18 @@ class QueryBuilder extends BaseQueryBuilder {
 
     /** @type {Set<String>} */
     this.ignoredScopes = new Set()
+
+    /** @type {EventsPipeline} */
+    this.events = this.constructor.Model.events.clone()
+  }
+
+  table () {
+    throw new KexError('Can\'t use table() in models query builder')
+  }
+
+  newInstance () {
+    const Builder = this.constructor
+    return new Builder(this.client)
   }
 
   /**
