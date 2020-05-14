@@ -2,6 +2,7 @@ const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
+/** @typedef { import('./model') } Model */
 
 /**
  * @callback Scope
@@ -142,13 +143,20 @@ class QueryBuilder extends BaseQueryBuilder {
 /**
  * Create the a new child class of QueryBuilder
  *
- * @param {import('./model')} Model
+ * @param {Model} Model
  * @returns {typeof QueryBuilder}
  */
 const createChildClass = (Model) => {
   class ChildQueryBuilder extends QueryBuilder {
     static get tableName () {
-      return Model.tableName
+      return this.Model.tableName
+    }
+
+    /**
+     * @return {Model}
+     */
+    static get Model () {
+      return Model
     }
   }
 
