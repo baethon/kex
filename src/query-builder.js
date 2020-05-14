@@ -1,5 +1,6 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
+const { FetchingEvent } = require('./events')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
@@ -149,6 +150,23 @@ class QueryBuilder extends BaseQueryBuilder {
       // it with the `qb`
       Object.assign(qb, builder)
     })
+  }
+
+  async then () {
+    const fetching = new FetchingEvent(this)
+
+    await this.events.emit(fetching)
+
+    if (fetching.cancelled) {
+      return undefined
+    }
+
+    const results = await super.then()
+    const fetched = fetching.toAfterEvent(results)
+
+    await this.events.emit(fetched)
+
+    return fetched.results
   }
 }
 
