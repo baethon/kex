@@ -143,3 +143,69 @@ test.serial('updating/updated | cancel update', async t => {
 
   t.truthy(check.active)
 })
+
+test.serial('deleting/deleted', async t => {
+  const { User, knex } = t.context
+
+  const deleting = sinon.stub()
+  const deleted = sinon.stub()
+  const [userId] = await knex.table('users')
+    .returning('id')
+    .insert({
+      username: 'arya',
+      first_name: 'Arya',
+      last_name: 'Stark',
+      active: true
+    })
+
+  User.events.on('deleting', deleting)
+  User.events.on('deleted', deleted)
+
+  const query = User.query()
+    .where('id', userId)
+    .delete()
+
+  await query
+
+  const check = await User.find(userId)
+
+  await knex.table('users')
+    .where('id', userId)
+    .delete()
+
+  t.true(deleting.calledWith(new events.DeletingEvent(query)))
+  t.true(deleted.calledWith(new events.DeletedEvent(sinon.match.any)))
+  t.falsy(check)
+})
+
+test.serial('deleting/deleted | cancel event', async t => {
+  const { User, knex } = t.context
+
+  const deleted = sinon.stub()
+  const [userId] = await knex.table('users')
+    .returning('id')
+    .insert({
+      username: 'arya',
+      first_name: 'Arya',
+      last_name: 'Stark',
+      active: true
+    })
+
+  User.events.on('deleting', (event) => {
+    event.cancel()
+  })
+  User.events.on('deleted', deleted)
+
+  await User.query()
+    .where('id', userId)
+    .delete()
+
+  const check = await User.find(userId)
+
+  await knex.table('users')
+    .where('id', userId)
+    .delete()
+
+  t.false(deleted.called)
+  t.truthy(check)
+})

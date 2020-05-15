@@ -1,6 +1,6 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
-const { FetchingEvent, UpdatingEvent } = require('./events')
+const { FetchingEvent, UpdatingEvent, DeletingEvent } = require('./events')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
@@ -160,6 +160,11 @@ class QueryBuilder extends BaseQueryBuilder {
     this.toEmit.event = new UpdatingEvent(this, values, returning)
 
     return super.update(values, returning)
+  }
+
+  delete (returning) {
+    this.toEmit.event = new DeletingEvent(this, returning)
+    return super.delete(returning)
   }
 
   async then () {
