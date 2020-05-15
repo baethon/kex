@@ -7,10 +7,15 @@ class Event {
 
   constructor () {
     this.cancelled = false
+    this.emitted = false
   }
 
   cancel () {
     this.cancelled = true
+  }
+
+  markEmitted () {
+    this.emitted = true
   }
 
   /**

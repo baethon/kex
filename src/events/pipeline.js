@@ -34,14 +34,21 @@ class EventsPipeline {
    * Execute all listeners of given event.
    *
    * The listeners are called serially.
+   * Event instance can be emitted only once. To repeat its emission, create new event.
    *
    * @param {Event} event
    * @return {Promise<Boolean>} the result of calling the listener;
    *                            FALSE indicates that event was cancelled
    */
   async emit (event) {
+    if (event.emitted) {
+      return false
+    }
+
     const { eventName } = event.constructor
     const list = this.listeners.get(eventName) || []
+
+    event.markEmitted()
 
     for (let i = 0; i < list.length; i++) {
       await list[i](event)

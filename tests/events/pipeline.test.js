@@ -35,8 +35,23 @@ test('call listeners', async t => {
 
   await events.emit(event)
 
+  t.true(event.emitted)
   t.true(firstListener.calledWith(event))
   t.true(secondListener.calledWith(event))
+})
+
+test('prevent second emission of the same event', async t => {
+  const events = new EventsPipeline()
+  const firstListener = sinon.stub()
+
+  events.on('test', firstListener)
+
+  const event = new TestEvent()
+  event.markEmitted()
+
+  await events.emit(event)
+
+  t.false(firstListener.called)
 })
 
 test('cancel event', async t => {
