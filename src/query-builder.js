@@ -1,6 +1,6 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
-const { FetchingEvent } = require('./events')
+const { FetchingEvent, UpdatingEvent } = require('./events')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
@@ -86,6 +86,10 @@ class QueryBuilder extends BaseQueryBuilder {
 
     /** @type {EventsPipeline} */
     this.events = this.constructor.Model.events.clone()
+
+    this.toEmit = {
+      event: new FetchingEvent(this)
+    }
   }
 
   table () {
@@ -152,21 +156,27 @@ class QueryBuilder extends BaseQueryBuilder {
     })
   }
 
+  update (values, returning) {
+    this.toEmit.event = new UpdatingEvent(this, values, returning)
+
+    return super.update(values, returning)
+  }
+
   async then () {
-    const fetching = new FetchingEvent(this)
+    const { event } = this.toEmit
 
-    await this.events.emit(fetching)
+    await this.events.emit(event)
 
-    if (fetching.cancelled) {
+    if (event.cancelled) {
       return undefined
     }
 
     const results = await super.then()
-    const fetched = fetching.toAfterEvent(results)
+    const afterEvent = event.toAfterEvent(results)
 
-    await this.events.emit(fetched)
+    await this.events.emit(afterEvent)
 
-    return fetched.results
+    return afterEvent.results
   }
 }
 

@@ -3,7 +3,7 @@ const sinon = require('sinon')
 const setupDb = require('./setup-db')
 const { createKex } = require('./utils')
 const { compareDbResults } = require('./assertions')
-const { FetchingEvent, FetchedEvent } = require('../src/events')
+const events = require('../src/events')
 
 setupDb()
 
@@ -38,8 +38,8 @@ test('fetched/fetching', async t => {
   const query = User.query()
   const actual = await query
 
-  t.true(fetching.calledWith(new FetchingEvent(query)))
-  t.true(fetched.calledWith(new FetchedEvent(expected)))
+  t.true(fetching.calledWith(new events.FetchingEvent(query)))
+  t.true(fetched.calledWith(new events.FetchedEvent(expected)))
   compareDbResults(t, expected, actual)
 })
 
@@ -69,4 +69,77 @@ test('fetched/fetching | modify end results', async t => {
   const actual = await User.query()
 
   t.is(actual, 'foo')
+})
+
+test.serial('updating/updated', async t => {
+  const { User, knex } = t.context
+
+  const updating = sinon.stub()
+  const updated = sinon.stub()
+  const [userId] = await knex.table('users')
+    .returning('id')
+    .insert({
+      username: 'arya',
+      first_name: 'Arya',
+      last_name: 'Stark',
+      active: true
+    })
+
+  User.events.on('updating', updating)
+  User.events.on('updated', updated)
+
+  const data = { active: false }
+  const query = User.query()
+    .where('id', userId)
+    .update(data)
+
+  await query
+
+  const check = await User.find(userId)
+
+  await User.find(userId)
+    .delete()
+
+  t.true(updating.calledWith(new events.UpdatingEvent(query, data)))
+  t.true(updated.calledWith(new events.UpdatedEvent(
+    sinon.match.any,
+    data
+  )))
+
+  t.falsy(check.active)
+})
+
+test.serial('updating/updated | cancel update', async t => {
+  const { User, knex } = t.context
+
+  const updated = sinon.stub()
+  const [userId] = await knex.table('users')
+    .returning('id')
+    .insert({
+      username: 'arya',
+      first_name: 'Arya',
+      last_name: 'Stark',
+      active: true
+    })
+
+  User.events.on('updating', (event) => {
+    event.cancel()
+  })
+  User.events.on('updated', updated)
+
+  const data = { active: false }
+  const query = User.query()
+    .where('id', userId)
+    .update(data)
+
+  await query
+
+  const check = await User.find(userId)
+
+  await User.find(userId)
+    .delete()
+
+  t.false(updated.called)
+
+  t.truthy(check.active)
 })
