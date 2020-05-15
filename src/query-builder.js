@@ -1,6 +1,11 @@
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
-const { FetchingEvent, UpdatingEvent, DeletingEvent } = require('./events')
+const {
+  FetchingEvent,
+  UpdatingEvent,
+  DeletingEvent,
+  InsertingEvent
+} = require('./events')
 
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
@@ -184,6 +189,9 @@ class QueryBuilder extends BaseQueryBuilder {
 
       case 'del':
         return new DeletingEvent(this._single.returning)
+
+      case 'insert':
+        return new InsertingEvent(this._single.insert, this._single.returning)
 
       default:
         return new FetchingEvent()

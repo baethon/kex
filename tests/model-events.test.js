@@ -247,4 +247,87 @@ test.serial('deleting/deleted | cancel event', async t => {
   t.truthy(check)
 })
 
-test.todo('inserting/inserted')
+test.serial('inserting/inserted', async t => {
+  const { User } = t.context
+
+  const inserting = sinon.stub()
+  const inserted = sinon.stub()
+  const data = {
+    username: 'arya',
+    first_name: 'Arya',
+    last_name: 'Stark',
+    active: true
+  }
+
+  User.events.on('inserting', inserting)
+  User.events.on('inserted', inserted)
+
+  const [userId] = await User.returning('id')
+    .insert(data)
+
+  await User.findOrFail(userId)
+  await User.find(userId)
+    .delete()
+
+  t.true(inserting.calledWith(emitted(new events.InsertingEvent(data, 'id'))))
+  t.true(inserted.calledWith(emitted(new events.InsertedEvent(
+    sinon.match.any,
+    data
+  ))))
+})
+
+test.serial('inserting/inserted | cancel inserting', async t => {
+  const { User } = t.context
+
+  const inserted = sinon.stub()
+  const data = {
+    username: 'arya',
+    first_name: 'Arya',
+    last_name: 'Stark',
+    active: true
+  }
+
+  User.events.on('inserting', (event) => {
+    event.cancel()
+  })
+  User.events.on('inserted', inserted)
+
+  const [{ count: usersCount }] = await User.query().count()
+
+  const result = await User.returning('id')
+    .insert(data)
+
+  const [{ count: checkCount }] = await User.query().count()
+
+  t.false(inserted.called)
+  t.is(checkCount, usersCount)
+  t.falsy(result)
+})
+
+test.serial('inserting/inserted | modify data', async t => {
+  const { User } = t.context
+
+  const data = {
+    username: 'arya',
+    first_name: 'Arya',
+    last_name: 'Stark',
+    active: true
+  }
+
+  User.events.on('inserting', (event) => {
+    event.values = {
+      ...event.values,
+      active: false
+    }
+  })
+
+  const [userId] = await User.returning('id')
+    .insert(data)
+
+  const check = await User.findOrFail(userId)
+
+  await User.find(userId)
+    .delete()
+
+  t.falsy(check.active)
+})
