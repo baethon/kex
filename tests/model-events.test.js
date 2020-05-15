@@ -7,6 +7,11 @@ const events = require('../src/events')
 
 setupDb()
 
+const emitted = event => {
+  event.markEmitted()
+  return event
+}
+
 test.beforeEach(t => {
   const kex = createKex(t)
   t.context.User = kex.createModel('User')
@@ -35,11 +40,10 @@ test('fetched/fetching', async t => {
   User.events.on('fetched', fetched)
 
   const expected = await knex.table('users')
-  const query = User.query()
-  const actual = await query
+  const actual = await User.query()
 
-  t.true(fetching.calledWith(new events.FetchingEvent(query)))
-  t.true(fetched.calledWith(new events.FetchedEvent(expected)))
+  t.true(fetching.calledWith(emitted(new events.FetchingEvent())))
+  t.true(fetched.calledWith(emitted(new events.FetchedEvent(expected))))
   compareDbResults(t, expected, actual)
 })
 
@@ -100,13 +104,46 @@ test.serial('updating/updated', async t => {
   await User.find(userId)
     .delete()
 
-  t.true(updating.calledWith(new events.UpdatingEvent(query, data)))
-  t.true(updated.calledWith(new events.UpdatedEvent(
+  t.true(updating.calledWith(emitted(new events.UpdatingEvent(data))))
+  t.true(updated.calledWith(emitted(new events.UpdatedEvent(
     sinon.match.any,
     data
-  )))
+  ))))
 
   t.falsy(check.active)
+})
+
+test.serial('updating/updated | alter update data', async t => {
+  const { User, knex } = t.context
+
+  const [userId] = await knex.table('users')
+    .returning('id')
+    .insert({
+      username: 'arya',
+      first_name: 'Arya',
+      last_name: 'Stark',
+      active: true
+    })
+
+  User.events.on('updating', (event) => {
+    event.values = {
+      ...event.values,
+      last_name: 'No name'
+    }
+  })
+
+  const data = { active: false }
+  await User.query()
+    .where('id', userId)
+    .update(data)
+
+  const check = await User.find(userId)
+
+  await User.find(userId)
+    .delete()
+
+  t.falsy(check.active)
+  t.is(check.last_name, 'No name')
 })
 
 test.serial('updating/updated | cancel update', async t => {
@@ -173,8 +210,8 @@ test.serial('deleting/deleted', async t => {
     .where('id', userId)
     .delete()
 
-  t.true(deleting.calledWith(new events.DeletingEvent(query)))
-  t.true(deleted.calledWith(new events.DeletedEvent(sinon.match.any)))
+  t.true(deleting.calledWith(emitted(new events.DeletingEvent())))
+  t.true(deleted.calledWith(emitted(new events.DeletedEvent(sinon.match.any))))
   t.falsy(check)
 })
 
@@ -209,3 +246,5 @@ test.serial('deleting/deleted | cancel event', async t => {
   t.false(deleted.called)
   t.truthy(check)
 })
+
+test.todo('inserting/inserted')

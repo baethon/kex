@@ -5,6 +5,7 @@ const { FetchingEvent, UpdatingEvent, DeletingEvent } = require('./events')
 /** @typedef { import('knex/lib/client') } KnexClient */
 /** @typedef { import('./model') } Model */
 /** @typedef { import('./events/pipeline') } EventsPipeline */
+/** @typedef { import('./events/event') } Event */
 
 /**
  * @callback Scope
@@ -86,10 +87,6 @@ class QueryBuilder extends BaseQueryBuilder {
 
     /** @type {EventsPipeline} */
     this.events = this.constructor.Model.events.clone()
-
-    this.toEmit = {
-      event: new FetchingEvent(this)
-    }
   }
 
   table () {
@@ -156,19 +153,8 @@ class QueryBuilder extends BaseQueryBuilder {
     })
   }
 
-  update (values, returning) {
-    this.toEmit.event = new UpdatingEvent(this, values, returning)
-
-    return super.update(values, returning)
-  }
-
-  delete (returning) {
-    this.toEmit.event = new DeletingEvent(this, returning)
-    return super.delete(returning)
-  }
-
   async then () {
-    const { event } = this.toEmit
+    const event = this.createEventToEmit()
 
     await this.events.emit(event)
 
@@ -176,12 +162,32 @@ class QueryBuilder extends BaseQueryBuilder {
       return undefined
     }
 
+    event.mutateQueryBuilder(this)
+
     const results = await super.then()
     const afterEvent = event.toAfterEvent(results)
 
     await this.events.emit(afterEvent)
 
     return afterEvent.results
+  }
+
+  /**
+   * Create the event which should be emitted before the query
+   *
+   * @return {Event}
+   */
+  createEventToEmit () {
+    switch (this._method) {
+      case 'update':
+        return new UpdatingEvent(this._single.update, this._single.returning)
+
+      case 'del':
+        return new DeletingEvent(this._single.returning)
+
+      default:
+        return new FetchingEvent()
+    }
   }
 }
 

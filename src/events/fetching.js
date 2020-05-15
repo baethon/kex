@@ -7,15 +7,6 @@ class Fetching extends Event {
   }
 
   /**
-   * @param {import('knex/lib/query/builder')} queryBuilder
-   */
-  constructor (queryBuilder) {
-    super()
-
-    this.queryBuilder = queryBuilder
-  }
-
-  /**
    * @param {*} results
    * @return {import('./fetched')}
    */

@@ -34,7 +34,7 @@ class EventsPipeline {
    * Execute all listeners of given event.
    *
    * The listeners are called serially.
-   * Event instance can be emitted only once. To repeat its emission, create new event.
+   * Event instance can be emitted only once. To repeat it emission, create new event.
    *
    * @param {Event} event
    * @return {Promise<Boolean>} the result of calling the listener;

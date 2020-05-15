@@ -7,16 +7,19 @@ class Updating extends Event {
   }
 
   /**
-   * @param {import('knex/lib/query/builder')} queryBuilder
    * @param {Object|Object[]} values
    * @param {String|String[]} returning
    */
-  constructor (queryBuilder, values, returning) {
+  constructor (values, returning) {
     super()
 
-    this.queryBuilder = queryBuilder
     this.values = values
     this.returning = returning
+  }
+
+  mutateQueryBuilder (qb) {
+    qb._single.update = this.values
+    qb._single.returning = this.returning
   }
 
   /**

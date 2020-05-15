@@ -7,14 +7,15 @@ class Deleting extends Event {
   }
 
   /**
-   * @param {import('knex/lib/query/builder')} queryBuilder
    * @param {String|String[]} returning
    */
-  constructor (queryBuilder, returning) {
+  constructor (returning) {
     super()
-
-    this.queryBuilder = queryBuilder
     this.returning = returning
+  }
+
+  mutateQueryBuilder (qb) {
+    qb._single.returning = this.returning
   }
 
   /**

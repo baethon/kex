@@ -18,6 +18,10 @@ class Event {
     this.emitted = true
   }
 
+  mutateQueryBuilder (qb) {
+    // extend on when required
+  }
+
   /**
    * @param {*} results
    * @return {Event}
