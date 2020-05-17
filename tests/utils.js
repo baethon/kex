@@ -1,4 +1,5 @@
 const test = require('ava')
+const faker = require('faker')
 const { Kex } = require('../')
 
 const createKex = (t, options = {}) => {
@@ -17,4 +18,11 @@ const onlyForClient = (dbClient, name, testFn) => {
   test(name, testFn)
 }
 
-module.exports = { createKex, onlyForClient }
+const userFactory = () => ({
+  username: faker.internet.userName(),
+  first_name: faker.name.firstName(),
+  last_name: faker.name.lastName(),
+  active: true
+})
+
+module.exports = { createKex, onlyForClient, userFactory }
