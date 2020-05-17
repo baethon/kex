@@ -5,7 +5,6 @@ const { parseIncludes } = require('./parser')
  * @param {import('../../model')} Model
  */
 module.exports = (Model) => {
-  const { QueryBuilder } = Model
   const related = new Related(Model)
 
   Model.QueryBuilder.extend({
@@ -20,16 +19,7 @@ module.exports = (Model) => {
     }
   })
 
-  const { then: thenMethod } = QueryBuilder.prototype
-
-  QueryBuilder.extend({
-    methodName: 'then',
-    force: true,
-    fn (resolve, reject) {
-      return thenMethod.call(this)
-        .then(results => related.fetchRelated(results, this.includes))
-        .then(resolve)
-        .catch(reject)
-    }
+  Model.on('fetched', async function (event) {
+    event.results = await related.fetchRelated(event.results, this.includes)
   })
 }

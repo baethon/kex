@@ -1,3 +1,4 @@
+const promiseDuck = require('@baethon/promise-duck')
 const BaseQueryBuilder = require('knex/lib/query/builder')
 const { KexError } = require('./errors')
 const {
@@ -92,6 +93,9 @@ class QueryBuilder extends BaseQueryBuilder {
 
     /** @type {EventsPipeline} */
     this.events = this.constructor.Model.events.clone()
+
+    // overwrite native then() method
+    Object.assign(this, promiseDuck.thenable(this.fetch.bind(this)))
   }
 
   table () {
@@ -158,7 +162,12 @@ class QueryBuilder extends BaseQueryBuilder {
     })
   }
 
-  async then () {
+  /**
+   * Execute the query and fetch the results
+   *
+   * @return {Promise<*>}
+   */
+  async fetch () {
     const event = this.createEventToEmit()
 
     await this.events.emit(event, this)
@@ -169,7 +178,7 @@ class QueryBuilder extends BaseQueryBuilder {
 
     event.mutateQueryBuilder(this)
 
-    const results = await super.then()
+    const results = await BaseQueryBuilder.prototype.then.call(this)
     const afterEvent = event.toAfterEvent(results)
 
     await this.events.emit(afterEvent, this)
