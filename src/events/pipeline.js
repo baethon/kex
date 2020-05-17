@@ -1,5 +1,11 @@
-/** @typedef {Map<String, Function[]>} Listeners */
 /** @typedef { import('./event') } Event */
+
+/**
+ * @callback EventListener
+ * @param {Event} event
+ */
+
+/** @typedef {Map<String, EventListener[]>} Listeners */
 
 class EventsPipeline {
   /**
@@ -12,7 +18,7 @@ class EventsPipeline {
 
   /**
    * @param {String} eventName
-   * @param {Function} listener
+   * @param {EventListener} listener
    * @return {Function} a callback which removes the listener
    */
   on (eventName, listener) {

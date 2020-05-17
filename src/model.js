@@ -8,6 +8,7 @@ const { EventsPipeline } = require('./events')
 /** @typedef { import('./relations/relation') } Relation */
 /** @typedef { import('./query-builder').Scope } Scope */
 /** @typedef { import('./plugins/timestamps').TimestampsOptions } TimestampsOptions */
+/** @typedef { import('./events/pipeline').EventListener } EventListener */
 
 /**
  * @typedef {Object} ModelOptions
@@ -75,6 +76,16 @@ class Model {
     this[methodName] = (...args) => {
       return fn.call(this, ...args)
     }
+  }
+
+  /**
+   * @param {String} eventName
+   * @param {EventListener} listener
+   * @return {Model}
+   */
+  on (eventName, listener) {
+    this.events.on(eventName, listener)
+    return this
   }
 
   /**
