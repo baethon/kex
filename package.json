@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "ava": "^3.6.0",
+    "faker": "^4.1.0",
     "husky": "^4.2.3",
     "knex": "^0.20.13",
     "lint-staged": "^10.1.1",
