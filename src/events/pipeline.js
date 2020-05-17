@@ -43,10 +43,11 @@ class EventsPipeline {
    * Event instance can be emitted only once. To repeat it emission, create new event.
    *
    * @param {Event} event
+   * @param {*} [bind] value to bind with the listener
    * @return {Promise<Boolean>} the result of calling the listener;
    *                            FALSE indicates that event was cancelled
    */
-  async emit (event) {
+  async emit (event, bind = null) {
     if (event.emitted) {
       return false
     }
@@ -57,7 +58,9 @@ class EventsPipeline {
     event.markEmitted()
 
     for (let i = 0; i < list.length; i++) {
-      await list[i](event)
+      const fn = list[i]
+
+      await fn.call(bind, event)
 
       if (event.cancelled) {
         return false

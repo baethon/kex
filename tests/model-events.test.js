@@ -331,3 +331,17 @@ test.serial('inserting/inserted | modify data', async t => {
 
   t.falsy(check.active)
 })
+
+test('query builder binding', async t => {
+  const { User } = t.context
+  const assert = function () {
+    t.true(this instanceof User.QueryBuilder)
+  }
+
+  t.plan(2)
+
+  User.on('fetching', assert)
+  User.on('fetched', assert)
+
+  await User.query()
+})

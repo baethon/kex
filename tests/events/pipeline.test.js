@@ -105,3 +105,16 @@ test('cloning', t => {
   t.false(events.listeners.get('test') === cloned.listeners.get('test'))
   t.deepEqual(events.listeners.get('test'), cloned.listeners.get('test'))
 })
+
+test('binding', async t => {
+  const fakeContext = {}
+  const events = new EventsPipeline()
+  t.plan(1)
+
+  events.on('test', function () {
+    t.is(fakeContext, this)
+  })
+
+  const event = new TestEvent()
+  await events.emit(event, fakeContext)
+})

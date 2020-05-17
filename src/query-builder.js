@@ -161,7 +161,7 @@ class QueryBuilder extends BaseQueryBuilder {
   async then () {
     const event = this.createEventToEmit()
 
-    await this.events.emit(event)
+    await this.events.emit(event, this)
 
     if (event.cancelled) {
       return undefined
@@ -172,7 +172,7 @@ class QueryBuilder extends BaseQueryBuilder {
     const results = await super.then()
     const afterEvent = event.toAfterEvent(results)
 
-    await this.events.emit(afterEvent)
+    await this.events.emit(afterEvent, this)
 
     return afterEvent.results
   }
