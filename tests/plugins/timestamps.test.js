@@ -1,97 +1,178 @@
 const test = require('ava')
 const sinon = require('sinon')
 const setupDb = require('../setup-db')
-const { equalQueries } = require('../assertions')
-const { createKex } = require('../utils')
+const { createKex, userFactory } = require('../utils')
 
 setupDb()
 
-test.before(() => {
-  sinon.useFakeTimers({ now: new Date() })
+const timestampFields = {
+  created: null,
+  created_at: null,
+  updated: null,
+  updated_at: null
+}
+const userData = userFactory()
+
+test.before(t => {
+  const clock = sinon.useFakeTimers({ now: new Date() })
+  t.context.clock = clock
 })
 
-test('disabled timestamps', t => {
+test.beforeEach(async t => {
   const { knex } = t.context
-  const User = createKex(t).createModel('User')
 
-  equalQueries(t, knex.from('users').insert({ foo: 1 }), User.insert({ foo: 1 }))
-  equalQueries(t, knex.from('users').update({ foo: 1 }), User.query().update({ foo: 1 }))
+  const trx = await knex.transaction()
+  const kex = createKex(t, {
+    knexClientResolver: () => trx.client
+  })
+
+  Object.assign(t.context, { kex, trx })
 })
 
-test('insert | default columns', async t => {
-  const { knex } = t.context
-  const User = createKex(t).createModel('User', {
+test.afterEach.always(async t => {
+  const { trx } = t.context
+
+  await trx.rollback()
+})
+
+test.serial('disabled timestamps', async t => {
+  const { kex } = t.context
+
+  const User = kex.createModel('User')
+  const [id] = await User.returning('id')
+    .insert(userData)
+
+  await User.query()
+    .where({
+      ...userData,
+      ...timestampFields
+    })
+    .firstOrFail()
+
+  await User.find(id)
+    .update({ active: false })
+
+  await User.query()
+    .where({
+      ...userData,
+      ...timestampFields,
+      active: false
+    })
+    .firstOrFail()
+
+  t.pass()
+})
+
+test.serial('insert | default columns', async t => {
+  const { kex } = t.context
+  const User = kex.createModel('User', {
     timestamps: true
   })
 
-  const expected = knex.table('users').insert({
-    foo: 1,
-    updated_at: new Date(),
-    created_at: new Date()
-  })
+  await User.insert(userData)
+  await User.query()
+    .where({
+      ...userData,
+      ...timestampFields,
+      updated_at: new Date(),
+      created_at: new Date()
+    })
+    .firstOrFail()
 
-  equalQueries(t, expected, User.insert({ foo: 1 }))
+  t.pass()
 })
 
-test('insert | list of items', async t => {
-  const { knex } = t.context
-  const User = createKex(t).createModel('User', {
+test.serial('insert | list of items', async t => {
+  const { kex } = t.context
+  const User = kex.createModel('User', {
     timestamps: true
   })
 
   const data = [
-    { foo: 1 },
-    { foo: 2 }
+    userFactory(),
+    userFactory()
   ]
 
-  const expected = knex.table('users').insert(data.map(item => ({
-    ...item,
-    updated_at: new Date(),
-    created_at: new Date()
-  })))
+  await User.insert(data)
 
-  equalQueries(t, expected, User.insert(data))
+  await Promise.all(data.map(item => User.query()
+    .where({
+      ...item,
+      ...timestampFields,
+      updated_at: new Date(),
+      created_at: new Date()
+    })
+    .firstOrFail()
+  ))
+
+  t.pass()
 })
 
-test('insert | custom column name', async t => {
-  const { knex } = t.context
-  const User = createKex(t).createModel('User', {
-    timestamps: { createdAtColumn: 'createdAt', updatedAtColumn: 'updatedAt' }
+test.serial('insert | custom column name', async t => {
+  const { kex } = t.context
+  const User = kex.createModel('User', {
+    timestamps: { createdAtColumn: 'created', updatedAtColumn: 'updated' }
   })
 
-  const expected = knex.table('users').insert({
-    foo: 1,
-    updatedAt: new Date(),
-    createdAt: new Date()
-  })
+  await User.insert(userData)
+  await User.query()
+    .where({
+      ...userData,
+      ...timestampFields,
+      created: new Date(),
+      updated: new Date()
+    })
+    .firstOrFail()
 
-  equalQueries(t, expected, User.insert({ foo: 1 }))
+  t.pass()
 })
 
-test('update | default columns', async t => {
-  const { knex } = t.context
-  const User = createKex(t).createModel('User', {
+test.serial('update | default columns', async t => {
+  const { kex, clock } = t.context
+  const User = kex.createModel('User', {
     timestamps: true
   })
 
-  const expected = knex.table('users').update({
-    foo: 1,
-    updated_at: new Date()
-  })
+  const createdAt = new Date()
+  const [id] = await User.returning('id')
+    .insert(userData)
 
-  equalQueries(t, expected, User.query().update({ foo: 1 }))
+  clock.tick(1000)
+
+  await User.find(id)
+    .update({ active: false })
+
+  await User.query()
+    .where({
+      ...userData,
+      active: false,
+      created_at: createdAt,
+      updated_at: new Date()
+    })
+    .firstOrFail()
+
+  t.pass()
 })
 
-test('update | custom column name', async t => {
-  const { knex } = t.context
-  const User = createKex(t).createModel('User', {
-    timestamps: { createdAtColumn: 'createdAt', updatedAtColumn: 'updatedAt' }
+test.serial('update | custom column name', async t => {
+  const { kex } = t.context
+  const User = kex.createModel('User', {
+    timestamps: { updatedAtColumn: 'updated' }
   })
 
-  const expected = knex.table('users').update({
-    foo: 1,
-    updatedAt: new Date()
-  })
+  const jon = await User.where('username', 'jon')
+    .firstOrFail()
 
-  equalQueries(t, expected, User.query().update({ foo: 1 }))
+  await User.find(jon.id)
+    .update({ active: false })
+
+  await User.query()
+    .where({
+      ...jon,
+      active: false,
+      updated: new Date()
+    })
+    .firstOrFail()
+
+  t.pass()
 })

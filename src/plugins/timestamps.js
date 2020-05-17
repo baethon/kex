@@ -7,13 +7,13 @@ const setDateField = (name) => item => ({
 
 /**
  * @typedef {Object} TimestampsOptions
- * @property {String} [deletedAtColumn=deleted_at]
+ * @property {String} [createdAtColumn=created_at]
  * @property {String} [updatedAtColumn=updated_at]
  */
 
 /** @type {TimestampsOptions} */
 const defaults = {
-  deletedAtColumn: 'deleted_at',
+  createdAtColumn: 'created_at',
   updatedAtColumn: 'updated_at'
 }
 
@@ -27,47 +27,27 @@ module.exports = (Model) => {
     return
   }
 
-  const { QueryBuilder } = Model
-  const timestampsOptions = {
+  const options = {
     ...defaults,
     ...timestamps
   }
 
-  const {
-    createdAtColumn = 'created_at',
-    updatedAtColumn = 'updated_at'
-  } = timestampsOptions
+  const setUpdatedAt = setDateField(options.updatedAtColumn)
+  const setCreatedAt = setDateField(options.createdAtColumn)
+  const setBothFields = flow([
+    setUpdatedAt,
+    setCreatedAt
+  ])
 
-  const {
-    insert: insertMethod,
-    update: updateMethod
-  } = QueryBuilder.prototype
-
-  const setUpdatedAt = setDateField(updatedAtColumn)
-  const setCreatedAt = setDateField(createdAtColumn)
-
-  QueryBuilder.extend({
-    methodName: 'update',
-    force: true,
-    fn (values, returning) {
-      return updateMethod.call(this, setUpdatedAt(values), returning)
-    }
+  Model.on('updating', event => {
+    event.values = setUpdatedAt(event.values)
   })
 
-  QueryBuilder.extend({
-    methodName: 'insert',
-    force: true,
-    fn (values, returning) {
-      const update = flow([
-        setUpdatedAt,
-        setCreatedAt
-      ])
+  Model.on('inserting', event => {
+    const { values } = event
 
-      const newValues = Array.isArray(values)
-        ? values.map(update)
-        : update(values)
-
-      return insertMethod.call(this, newValues, returning)
-    }
+    event.values = Array.isArray(values)
+      ? values.map(setBothFields)
+      : setBothFields(values)
   })
 }

@@ -7,6 +7,10 @@ module.exports = {
         table.string('first_name')
         table.string('last_name')
         table.boolean('active').default(false)
+        table.datetime('created').nullable().default(null)
+        table.datetime('updated').nullable().default(null)
+        table.datetime('created_at').nullable().default(null)
+        table.datetime('updated_at').nullable().default(null)
       })
   },
 
