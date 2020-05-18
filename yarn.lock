@@ -30,6 +30,11 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@baethon/promise-duck@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@baethon/promise-duck/-/promise-duck-1.0.1.tgz#6c41a2451d3a8140cb8eaecaa928a1fe4c5fcabe"
+  integrity sha512-TPVq2hMtBTe9PDGzr2bcNmwAxw5rSWWxNIAkeOpZglS3KHOdJKRWSEjY6a6BSEy9XBKBLw+Z/cmqop22Jw+xQg==
+
 "@concordance/react@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@concordance/react/-/react-2.0.0.tgz#aef913f27474c53731f4fd79cc2f54897de90fde"
@@ -1511,6 +1516,11 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
+
+faker@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
+  integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
 
 fast-deep-equal@^3.1.1:
   version "3.1.1"

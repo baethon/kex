@@ -1,4 +1,5 @@
 const test = require('ava')
+const sinon = require('sinon')
 const setupDb = require('./setup-db')
 const { equalQueries } = require('./assertions')
 const { createKex } = require('./utils')
@@ -35,4 +36,26 @@ test('forbid using table()', t => {
     User.query()
       .table('foo')
   })
+})
+
+test('events | add listener', async t => {
+  const User = createKex(t).createModel('User')
+
+  const listener = sinon.stub()
+
+  await User.query()
+    .on('fetching', listener)
+
+  t.true(listener.calledOnce)
+})
+
+test('events | add knex native listener', async t => {
+  const User = createKex(t).createModel('User')
+
+  const listener = sinon.stub()
+
+  await User.query()
+    .on('query', listener, { native: true })
+
+  t.true(listener.calledOnce)
 })
