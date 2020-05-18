@@ -12,6 +12,7 @@ const {
 /** @typedef { import('./model') } Model */
 /** @typedef { import('./events/pipeline') } EventsPipeline */
 /** @typedef { import('./events/event') } Event */
+/** @typedef { import('./events/pipeline').EventListener } EventListener */
 
 /**
  * @callback Scope
@@ -205,6 +206,25 @@ class QueryBuilder extends BaseQueryBuilder {
       default:
         return new FetchingEvent()
     }
+  }
+
+  /**
+   * @param {String} eventName
+   * @param {EventListener|Function} listener
+   * @param {Object} [options]
+   * @param {Boolean} [options.native=false]
+   * @return {QueryBuilder}
+   */
+  on (eventName, listener, options = {}) {
+    const { native = false } = options
+
+    if (native) {
+      return BaseQueryBuilder.prototype.on.call(this, eventName, listener)
+    }
+
+    this.events.on(eventName, listener)
+
+    return this
   }
 }
 
