@@ -95,7 +95,7 @@ class QueryBuilder extends BaseQueryBuilder {
     this.events = this.constructor.Model.events.clone()
 
     // overwrite native then() method
-    Object.assign(this, promiseDuck.thenable(this.fetch.bind(this)))
+    Object.assign(this, promiseDuck.thenable(this.executeQuery.bind(this)))
   }
 
   table () {
@@ -167,7 +167,7 @@ class QueryBuilder extends BaseQueryBuilder {
    *
    * @return {Promise<*>}
    */
-  async fetch () {
+  async executeQuery () {
     const event = this.createEventToEmit()
 
     await this.events.emit(event, this)
