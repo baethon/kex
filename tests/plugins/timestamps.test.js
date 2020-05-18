@@ -1,5 +1,6 @@
 const test = require('ava')
 const sinon = require('sinon')
+const faker = require('faker')
 const setupDb = require('../setup-db')
 const { createKex, userFactory } = require('../utils')
 
@@ -14,7 +15,11 @@ const timestampFields = {
 const userData = userFactory()
 
 test.before(t => {
-  const clock = sinon.useFakeTimers({ now: new Date() })
+  // eliminate the milliseconds precision from current time
+  // without it, MySQL might return weird results
+  const now = Math.floor(new Date().getTime() / 1000)
+  const clock = sinon.useFakeTimers({ now: new Date(now * 1000) })
+
   t.context.clock = clock
 })
 
@@ -49,14 +54,16 @@ test.serial('disabled timestamps', async t => {
     })
     .firstOrFail()
 
+  const firstName = faker.name.firstName()
+
   await User.find(id)
-    .update({ active: false })
+    .update({ first_name: firstName })
 
   await User.query()
     .where({
       ...userData,
       ...timestampFields,
-      active: false
+      first_name: firstName
     })
     .firstOrFail()
 
@@ -139,13 +146,15 @@ test.serial('update | default columns', async t => {
 
   clock.tick(1000)
 
+  const firstName = faker.name.firstName()
+
   await User.find(id)
-    .update({ active: false })
+    .update({ first_name: firstName })
 
   await User.query()
     .where({
       ...userData,
-      active: false,
+      first_name: firstName,
       created_at: createdAt,
       updated_at: new Date()
     })
@@ -163,13 +172,15 @@ test.serial('update | custom column name', async t => {
   const jon = await User.where('username', 'jon')
     .firstOrFail()
 
+  const firstName = faker.name.firstName()
+
   await User.find(jon.id)
-    .update({ active: false })
+    .update({ first_name: firstName })
 
   await User.query()
     .where({
       ...jon,
-      active: false,
+      first_name: firstName,
       updated: new Date()
     })
     .firstOrFail()

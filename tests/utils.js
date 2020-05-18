@@ -22,7 +22,7 @@ const userFactory = () => ({
   username: faker.internet.userName(),
   first_name: faker.name.firstName(),
   last_name: faker.name.lastName(),
-  active: true
+  active: (process.env.DB_CLIENT === 'mysql') ? 1 : true
 })
 
 module.exports = { createKex, onlyForClient, userFactory }
