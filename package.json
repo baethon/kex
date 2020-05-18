@@ -20,7 +20,6 @@
     "@baethon/promise-duck": "^1.0.1",
     "dataloader": "^2.0.0",
     "lodash.flow": "^3.5.0",
-    "lodash.frompairs": "^4.0.1",
     "lodash.snakecase": "^4.1.1",
     "pluralize": "^8.0.0"
   },

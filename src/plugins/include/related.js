@@ -18,9 +18,9 @@ class Related {
    * @return {Promise<Object|Object[]>}
    */
   async fetchRelated (rows, includes) {
-    const entries = Object.entries(groupIncludes(includes || {}))
+    const entries = groupIncludes(includes || {})
 
-    if (!entries.length) {
+    if (!entries.size) {
       return rows
     }
 
@@ -30,9 +30,10 @@ class Related {
     // try to load the related items in parallel
     // the `fetchSingleRelation()` will return a list of "chunks" - objects that should be merged
     // directly into the corresponding row
-    const chunks = await Promise.all(entries.map(
-      ([name, scope]) => this.fetchSingleRelation(rowsToProcess, name, scope.toScopeFn())
-    ))
+    const chunks = await Promise.all(Array.from(entries.entries())
+      .map(
+        ([name, scope]) => this.fetchSingleRelation(rowsToProcess, name, scope.toScopeFn())
+      ))
 
     const combined = rowsToProcess.map((row, i) => {
       return chunks.reduce(

@@ -37,10 +37,10 @@ test('parseIncludes() | use first array', t => {
 })
 
 test('groupIncludes() | don\'t group different relations', t => {
-  const expected = {
-    foo: new IncludeScope(noop),
-    bar: new IncludeScope(noop)
-  }
+  const expected = new Map([
+    ['foo', new IncludeScope(noop)],
+    ['bar', new IncludeScope(noop)]
+  ])
 
   t.deepEqual(expected, groupIncludes({
     foo: noop,
@@ -51,9 +51,9 @@ test('groupIncludes() | don\'t group different relations', t => {
 test('groupIncludes() | group includes', t => {
   const qb = () => {} // don't replace it with the noop
   // it's all about the references
-  const expected = {
-    foo: (new IncludeScope(noop)).addInclude('bar', qb)
-  }
+  const expected = new Map([
+    ['foo', (new IncludeScope(noop)).addInclude('bar', qb)]
+  ])
 
   t.deepEqual(expected, groupIncludes({
     foo: noop,
@@ -63,11 +63,11 @@ test('groupIncludes() | group includes', t => {
 
 test('groupIncludes() | set root scope', t => {
   const qb = () => {}
-  const expected = {
-    foo: (new IncludeScope())
+  const expected = new Map([
+    ['foo', (new IncludeScope())
       .setScope(qb)
-      .addInclude('bar', noop)
-  }
+      .addInclude('bar', noop)]
+  ])
 
   t.deepEqual(expected, groupIncludes({
     'foo.bar': noop,
@@ -76,12 +76,12 @@ test('groupIncludes() | set root scope', t => {
 })
 
 test('groupIncludes() | multiple nested includes', t => {
-  const expected = {
-    foo: (new IncludeScope(noop))
+  const expected = new Map([
+    ['foo', (new IncludeScope(noop))
       .addInclude('bar', noop)
       .addInclude('baz', noop)
-      .addInclude('bar.bah', noop)
-  }
+      .addInclude('bar.bah', noop)]
+  ])
 
   t.deepEqual(expected, groupIncludes({
     foo: noop,
