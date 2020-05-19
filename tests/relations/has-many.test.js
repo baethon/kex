@@ -65,7 +65,7 @@ test.serial('fetch messages | custom scope', macro, {
 
 const queryForSingleMacro = macros.createQueryForSingleMacro(HasMany)
 
-test('query for single | defaults', queryForSingleMacro, {
+test('query for single', queryForSingleMacro, {
   expectedFn: (Message, jon) => Message.query().fromUser(jon)
 })
 

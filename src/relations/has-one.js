@@ -1,59 +1,25 @@
-const DataLoader = require('dataloader')
-const { mapTo, prop, noop } = require('../utils')
-const Relation = require('./relation')
+const { noop, requiredArgument } = require('../utils')
+const HasMany = require('./has-many')
 
-/**
- * @callback DataLoader
- * @param {Object} item
- * @return {Promise<Object>}
- */
+/** @typedef {import('./has-many').DataLoader} DataLoader */
 
-class HasOne extends Relation {
+class HasOne extends HasMany {
   /**
-   * @param {String} related
-   * @param {Object} [options]
-   * @param {String} [options.foreignKey]
-   * @param {String} [options.localKey]
-   */
-  constructor (related, options = {}) {
-    super()
-
-    const { foreignKey, localKey } = options
-
-    this.related = related
-    this.foreignKey = foreignKey
-    this.localKey = localKey
-  }
-
-  /**
-   * @param {import('../model')} Model
-   * @param {import('../query-builder').Scope} [scope]
-   * @return {DataLoader}
+   * @inheritdoc
    */
   createDataLoader (Model, scope = noop) {
-    const { kex } = Model
+    const parentLoader = super.createDataLoader(Model, scope)
 
-    const Related = kex.getModel(this.related)
-    const foreignKey = this.foreignKey || this.getForeignKeyName(Model)
-    const localKey = this.getLocalKey()
-    const loader = new DataLoader(keys => {
-      const query = Related.query()
-        .whereIn(foreignKey, keys)
-
-      scope(query)
-
-      return query.then(mapTo(keys, prop(foreignKey)))
-    })
-
-    return model => loader.load(model[localKey])
+    return model => parentLoader(model)
+      .then(results => results.shift() || null)
   }
 
   /**
-   * @return {String}
-   * @private
+   * @inheritdoc
    */
-  getLocalKey () {
-    return this.localKey || 'id'
+  queryForSingle (Model, parentKey = requiredArgument('parentKey')) {
+    return super.queryForSingle(Model, parentKey)
+      .first()
   }
 }
 
