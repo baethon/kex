@@ -2,6 +2,7 @@ const test = require('ava')
 const setupDb = require('../setup-db')
 const { createKex } = require('../utils')
 const { HasMany, BelongsToMany, BelongsTo } = require('../../src/relations')
+const { compareDbResults } = require('../assertions')
 
 setupDb()
 
@@ -47,10 +48,12 @@ test('user relations | get tags', async t => {
     .select('tags.*')
     .join('user_tag', 'user_tag.tag_id', 'tags.id')
     .where('user_id', jon.id)
+    .orderBy('tags.id', 'asc')
 
   const actual = await User.tags(jon.id)
+    .orderBy('id', 'asc')
 
-  t.deepEqual(actual, expected)
+  compareDbResults(t, expected, actual)
 })
 
 test('user relations | get messages', async t => {
