@@ -3,17 +3,15 @@
 
 # @baethon/kex
 
-Kex is a query extension for [Knex](https://knexjs.org/). It uses the concept of "model" from ORMs like [Lucid](https://github.com/adonisjs/lucid), or [Laravel Eloquent](https://laravel.com/docs/7.x/eloquent) restricted only to making queries. It has support for scopes, plugins, relations and many more. 
+Kex is a query extension for [Knex](https://knexjs.org/). It uses the concept of "model" from ORMs like [Lucid](https://github.com/adonisjs/lucid), or [Laravel Eloquent](https://laravel.com/docs/7.x/eloquent) restricted only to make queries. It has support for scopes, plugins, relations, and many more.
 
 ## Installation
 
 Install the package:
 
 ```
-npm i @baethon/kex@next
+npm i @baethon/kex
 ```
-
-_(the package is still in RC version)_
 
 Set up Kex instance:
 
@@ -56,7 +54,7 @@ In some cases, you can omit the `query()` method and start chaining using follow
 const activeUsers = await User.where({ active: true })
 ```
 
-Unlike Knex, the models don't create a query when using other methods (e.g. `andWhere()` etc).
+Unlike Knex, the models don't create a query when using other methods (e.g. `andWhere()`).
 
 ## Creating new records
 
@@ -76,11 +74,16 @@ const [id] = await User.returning('id')
 ```js
 User.where({ active: true })
   .update({ active: false })
+  
+// to make an update of a single item you can use
+// following query
+User.find(userId)
+  .update({ active: true })
 ```
 
 ## Scopes
 
-[Scope](https://github.com/baethon/kex/wiki/Scopes) is a function that alters the query. They can be chained in a same way as other query methods.
+[Scope](https://github.com/baethon/kex/wiki/Scopes) is a function that alters the query. You can chain them as other query methods.
 
 Scopes are declared when creating a model:
 
@@ -93,7 +96,8 @@ const User = kex.createModel('User', {
   }
 })
 
-const activeUsers = await User.active()
+const activeUsers = await User.query()
+  .active()
 ```
 
 Scopes can be used in the callbacks of `where()`:
@@ -107,7 +111,7 @@ const usersList = await User.where(qb => {
 
 ## Global scopes
 
-[Global scope](https://github.com/baethon/kex/wiki/Scopes#global-scopes) is very similar to regular scope. The main difference is that it's applied automatically to every query.
+[Global scope](https://github.com/baethon/kex/wiki/Scopes#global-scopes) is very similar to the regular scope. The main difference is that it's applied automatically to every query.
 
 ```js 
 const User = kex.createModel('User', {
@@ -144,22 +148,22 @@ Kex supports many other things:
 
 Kex uses naming conventions taken from Lucid, or Eloquent:
 
-- table name is a snake_case version of pluralized model name (e.g. `users`)
+- the table name is a snake_case version of the pluralized model name (e.g. `users`)
 - the primary key is always `id`
-- foreign keys (used in relations) are snake_case version of table name (in singular form) postfixed with `_id` (e.g. `user_id`)
-- pivot table are a snake_case version of related table names (in singular form) joined in alphabetical order (e.g. `tag_user`)
+- foreign keys (used in relations) are snake_case version of a table name (in singular form) postfixed with `_id` (e.g. `user_id`)
+- the pivot table is a snake_case version of related table names (in singular form) joined in alphabetical order (e.g. `tag_user`)
 
-The naming can be altered using the configuration objects passed to the model.
+The naming is fully customizable.
 
-## But... why?
+## Motivation
 
-That's a great question! I've worked with a few Node ORMs. All of them have some problems. With my recent project, I used one of them. Quickly it became a problem. I decided to switch to a different one. Even worse. Then, a good mentor suggested that maybe I should use raw queries? Nah! Wait, Knex is very close to "raw". It has a nice migrations manager and a powerful query builder. It was a good choice.
+Full-blown ORMs offer fantastic features. Yet sometimes, it might be overkill for your application. What I needed is a customizable DBAL which wouldn't make too much magic behind the scenes. I wanted something like Knex, yet a little more robust.
 
-With this experience in mind I started to wonder - do I need an ORM? Do I _want_ an ORM? No! However, what I miss in Knex are the things which I love in Lucid, or Eloquent - scopes, relations, extensions, and some conventions. Kex tries to bring those concepts to Knex, but limit them only to queries. There won't be any active-record models and no hydration. Just queries and ways to manipulate them.
+Kex gives you the feeling of an ORM. However, it makes sure not to interfere with your work. Build a query and fetch the results. That's all. Don't worry about hydrated objects, results collections, or anything like that.
 
 ## Testing
 
-The test suite is a combination of unit tests and integration tests. The latter use by default a SQLite database, however you can (and sometimes must) choose a different database backend.
+The test suite is a combination of unit tests and integration tests. The latter use by default an SQLite database, however, you can (and sometimes must) choose a different database backend.
 
 To run tests:
 
@@ -167,7 +171,7 @@ To run tests:
 yarn test
 ```
 
-Running single test suite with:
+Running a single test suite with:
 
 ```
 yarn test tests/path/to/test-file.test.js
@@ -175,7 +179,7 @@ yarn test tests/path/to/test-file.test.js
 
 ### Using different database backend
 
-You will need to install client dependency:
+You need to install client dependency:
 
 - `mysql` for MySQL database
 - `pg` for PostgreSQL database
