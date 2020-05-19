@@ -3,7 +3,8 @@ const builtinPlugins = [
   require('./first-or-fail'),
   require('./soft-deletes'),
   require('./include'),
-  require('./timestamps')
+  require('./timestamps'),
+  require('./relations')
 ]
 
 /** @typedef { import('../model) } Model */
