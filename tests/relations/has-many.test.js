@@ -2,7 +2,7 @@ const test = require('ava')
 const setupDb = require('../setup-db')
 const { createKex } = require('../utils')
 const { HasMany } = require('../../')
-const createMacro = require('./has-any.macro')
+const macros = require('./has-any.macro')
 
 setupDb()
 
@@ -29,16 +29,16 @@ test.serial.before(async t => {
   Object.assign(t.context, { Message, User, users })
 })
 
-const macro = createMacro(HasMany)
+const macro = macros.createDataLoaderMacro(HasMany)
 
-test.serial(macro, {
+test.serial('fetch messages', macro, {
   expectedFn: (Message, users) => Promise.all([
     Message.query().fromUser(users.jon),
     Message.query().fromUser(users.sansa)
   ])
 })
 
-test.serial(macro, {
+test.serial('fetch messages | custom foreing key', macro, {
   expectedFn: (Message, users) => Promise.all([
     Message.query().toUser(users.jon),
     Message.query().toUser(users.sansa)
@@ -46,7 +46,7 @@ test.serial(macro, {
   foreignKey: 'to_user'
 })
 
-test.serial(macro, {
+test.serial('fetch messages | custom keys', macro, {
   expectedFn: (Message, users) => Promise.all([
     Message.query().fromUser(users.jon),
     Message.query().fromUser(users.sansa)
@@ -55,10 +55,27 @@ test.serial(macro, {
   localKey: 'username'
 })
 
-test.serial(macro, {
+test.serial('fetch messages | custom scope', macro, {
   expectedFn: (Message, users) => Promise.all([
     Message.query().fromUser(users.jon).onlyTrashed(),
     Message.query().fromUser(users.sansa).onlyTrashed()
   ]),
   scope: qb => qb.onlyTrashed()
+})
+
+const queryForSingleMacro = macros.createQueryForSingleMacro(HasMany)
+
+test('query for single', queryForSingleMacro, {
+  expectedFn: (Message, jon) => Message.query().fromUser(jon)
+})
+
+test('query for single | custom foreign key', queryForSingleMacro, {
+  expectedFn: (Message, jon) => Message.query().toUser(jon),
+  foreignKey: 'to_user'
+})
+
+test('query for single | custom keys', queryForSingleMacro, {
+  expectedFn: (Message, jon) => Message.query().fromUser(jon),
+  foreignKey: 'from_username',
+  localKey: 'username'
 })

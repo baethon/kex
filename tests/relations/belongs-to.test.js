@@ -23,20 +23,6 @@ const macro = async (t, options) => {
   t.deepEqual(expected, actual)
 }
 
-macro.title = (providedTitle, { foreignKey, otherKey, scope }) => {
-  const v = (name, value) => value
-    ? `${name}=${value}`
-    : `${name}=`
-
-  const chunks = [
-    v('foreignKey', foreignKey),
-    v('otherKey', otherKey),
-    v('scope', scope)
-  ]
-
-  return chunks.join(', ')
-}
-
 test.serial.before(async t => {
   const kex = createKex(t)
   const Message = kex.createModel('Message')
@@ -53,16 +39,46 @@ test.serial.before(async t => {
   Object.assign(t.context, { testMessage, User, Message })
 })
 
-test(macro, {
+test('fetch user | defaults', macro, {
   expectedFn: User => User.query().username('jon').firstOrFail()
 })
 
-test(macro, {
+test('fetch user | custom foreign key', macro, {
   expectedFn: User => User.query().username('sansa').firstOrFail(),
   foreignKey: 'to_user'
 })
 
-test(macro, {
+test('fetch user | custom keys', macro, {
+  expectedFn: User => User.query().username('jon').firstOrFail(),
+  foreignKey: 'from_username',
+  otherKey: 'username'
+})
+
+const queryForSingleMacro = async (t, options) => {
+  const {
+    expectedFn,
+    foreignKey = 'user_id',
+    otherKey = undefined
+  } = options
+
+  const { testMessage, User, Message } = t.context
+  const relation = new BelongsTo('User', { foreignKey, otherKey })
+  const expected = await expectedFn(User)
+  const actual = await relation.queryForSingle(Message, testMessage[foreignKey])
+
+  t.deepEqual(actual, expected)
+}
+
+test('query for single | defaults', queryForSingleMacro, {
+  expectedFn: User => User.query().username('jon').firstOrFail()
+})
+
+test('query for single | custom foreign key', queryForSingleMacro, {
+  expectedFn: User => User.query().username('sansa').firstOrFail(),
+  foreignKey: 'to_user'
+})
+
+test('query for single | custom keys', queryForSingleMacro, {
   expectedFn: User => User.query().username('jon').firstOrFail(),
   foreignKey: 'from_username',
   otherKey: 'username'

@@ -1,6 +1,8 @@
 const DataLoader = require('dataloader')
 const Relation = require('./relation')
-const { mapToMany, prop, noop } = require('../utils')
+const { mapToMany, prop, noop, requiredArgument } = require('../utils')
+
+/** @typedef {import('../model')} Model */
 
 /**
  * @callback DataLoader
@@ -26,23 +28,22 @@ class HasMany extends Relation {
   }
 
   /**
-   * @param {import('../model')} Model
+   * @param {Model} Model
    * @param {import('../query-builder').Scope} [scope]
    * @return {DataLoader}
    */
   createDataLoader (Model, scope = noop) {
-    const { kex } = Model
+    const {
+      Related,
+      foreignKey,
+      localKey
+    } = this.getRelationConfig(Model)
 
-    const Related = kex.getModel(this.related)
-    const foreignKey = this.foreignKey || this.getForeignKeyName(Model)
-    const localKey = this.getLocalKey()
     const loader = new DataLoader(keys => {
-      const query = Related.query()
+      return Related.query()
         .whereIn(foreignKey, keys)
-
-      scope(query)
-
-      return query.then(mapToMany(keys, prop(foreignKey)))
+        .modify(scope)
+        .then(mapToMany(keys, prop(foreignKey)))
     })
 
     return model => loader.load(model[localKey])
@@ -54,6 +55,34 @@ class HasMany extends Relation {
    */
   getLocalKey () {
     return this.localKey || 'id'
+  }
+
+  /**
+   * @param {Model} Model
+   * @return {Object}
+   */
+  getRelationConfig (Model) {
+    const { kex } = Model
+
+    const Related = kex.getModel(this.related)
+
+    return {
+      Related,
+      foreignKey: this.foreignKey || this.getForeignKeyName(Model),
+      localKey: this.getLocalKey()
+    }
+  }
+
+  /**
+   * @param {Model} Model
+   * @param {*} parentKey
+   * @return {import('knex/lib/query/builder')}
+   */
+  queryForSingle (Model, parentKey = requiredArgument('parentKey')) {
+    const { Related, foreignKey } = this.getRelationConfig(Model)
+
+    return Related.query()
+      .where(foreignKey, parentKey)
   }
 }
 
