@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG
 - Query proxy for `whereIn()` method
 - Support for events
+- Methods for fetching related data of a single item (e.g. `User.messages(1)`)
 
 ### Changed
 
