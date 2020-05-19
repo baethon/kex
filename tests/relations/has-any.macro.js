@@ -1,6 +1,6 @@
 const sinon = require('sinon')
 
-module.exports = Relation => {
+const createDataLoaderMacro = Relation => {
   const macro = async (t, options) => {
     const {
       expectedFn,
@@ -31,6 +31,10 @@ module.exports = Relation => {
   }
 
   macro.title = (providedTitle, { expectedFn, foreignKey, localKey, scope }) => {
+    if (providedTitle) {
+      return providedTitle
+    }
+
     const v = (name, value) => value
       ? `${name}=${value}`
       : `${name}=`
@@ -46,3 +50,22 @@ module.exports = Relation => {
 
   return macro
 }
+
+const createQueryForSingleMacro = Relation => async (t, options) => {
+  const {
+    expectedFn,
+    foreignKey = undefined,
+    localKey = 'id'
+  } = options
+
+  const { Message, users, User } = t.context
+  const { jon } = users
+
+  const relation = new Relation('Message', { foreignKey, localKey })
+  const expected = await expectedFn(Message, jon)
+  const actual = await relation.queryForSingle(User, jon[localKey])
+
+  t.deepEqual(actual, expected)
+}
+
+module.exports = { createDataLoaderMacro, createQueryForSingleMacro }
