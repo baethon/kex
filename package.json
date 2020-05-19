@@ -1,6 +1,6 @@
 {
   "name": "@baethon/kex",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "description": "Extend knex with query models",
   "keywords": [
     "knex",
