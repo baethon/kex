@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0]
+
 ### Added
 
 - This CHANGELOG
@@ -40,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for soft-deletes
 - Support for timestamps
 
-[unreleased]: https://github.com/baethon/kex/compare/v1.0.0-rc.1...HEAD
+[unreleased]: https://github.com/baethon/kex/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/baethon/kex/compare/v1.0.0-rc.1...v1.0.0
 [1.0.0-rc.1]: https://github.com/baethon/kex/compare/v1.0.0-rc.0...v1.0.0-rc.1
 [1.0.0-rc.0]: https://github.com/baethon/kex/releases/tag/v1.0.0-rc.0
