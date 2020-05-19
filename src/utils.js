@@ -70,5 +70,5 @@ module.exports = {
   isObject,
   prop: name => item => item[name],
   noop: () => {},
-  requiredArgument,
+  requiredArgument
 }
