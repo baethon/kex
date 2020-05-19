@@ -1,3 +1,6 @@
+![Node.js CI](https://github.com/baethon/kex/workflows/Node.js%20CI/badge.svg?branch=master)
+[![npm version](https://badge.fury.io/js/%40baethon%2Fkex.svg)](https://badge.fury.io/js/%40baethon%2Fkex)
+
 # @baethon/kex
 
 Kex is a query extension for [Knex](https://knexjs.org/). It uses the concept of "model" from ORMs like [Lucid](https://github.com/adonisjs/lucid), or [Laravel Eloquent](https://laravel.com/docs/7.x/eloquent) restricted only to making queries. It has support for scopes, plugins, relations and many more. 
