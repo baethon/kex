@@ -1,6 +1,6 @@
 const test = require('ava')
 const setupDb = require('./setup-db')
-const BaseQueryBuilder = require('knex/lib/query/builder')
+const BaseQueryBuilder = require('knex/lib/query/querybuilder')
 const { createKex } = require('./utils')
 
 setupDb()

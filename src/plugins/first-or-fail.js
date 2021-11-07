@@ -6,8 +6,8 @@ const { ModelNotFound } = require('../errors')
 module.exports = (Model) => {
   Model.QueryBuilder.extend({
     methodName: 'firstOrFail',
-    async fn (columns) {
-      const model = await this.first(columns)
+    async fn (...args) {
+      const model = await this.first(...args)
 
       if (!model) {
         throw ModelNotFound.firstOrFail(Model)

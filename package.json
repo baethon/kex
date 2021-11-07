@@ -27,14 +27,13 @@
     "ava": "^3.6.0",
     "faker": "^4.1.0",
     "husky": "^4.2.3",
-    "knex": "^0.20.13",
     "lint-staged": "^10.1.1",
     "sinon": "^9.0.2",
     "sqlite3": "^4.1.1",
     "standard": "^14.3.3"
   },
   "peerDependencies": {
-    "knex": "^0.20.13"
+    "knex": "^0.95.13"
   },
   "lint-staged": {
     "*.js": "npm run lint:fix"

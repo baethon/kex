@@ -1,5 +1,5 @@
 const promiseDuck = require('@baethon/promise-duck')
-const BaseQueryBuilder = require('knex/lib/query/builder')
+const BaseQueryBuilder = require('knex/lib/query/querybuilder')
 const { KexError } = require('./errors')
 const {
   FetchingEvent,
