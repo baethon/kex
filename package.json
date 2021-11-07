@@ -27,6 +27,7 @@
     "ava": "^3.6.0",
     "faker": "^4.1.0",
     "husky": "^4.2.3",
+    "install-peers": "^1.0.3",
     "lint-staged": "^10.1.1",
     "sinon": "^9.0.2",
     "sqlite3": "^4.1.1",
