@@ -46,6 +46,7 @@
   },
   "ava": {
     "failFast": true,
+    "serial": true,
     "files": [
       "tests/**/*.test.js"
     ]
